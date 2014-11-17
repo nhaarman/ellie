@@ -12,12 +12,8 @@ repositories {
 dependencies {
 	compile project(':core')
 
-	compile 'com.google.auto.service:auto-service:1.0-rc1'
 	compile 'com.google.guava:guava:18.0'
 	compile 'com.squareup:javawriter:2.5.0'
-
-	// I don't think this should be necessary, but my environment won't build without it.
-	testCompile files("${System.properties['java.home']}/../lib/tools.jar")
 
 	testCompile 'com.google.testing.compile:compile-testing:0.5'
 	testCompile 'junit:junit:4.10'
