@@ -42,11 +42,6 @@ public class ColumnValidator implements Validator {
 
 	@Override
 	public boolean validate(Element enclosingElement, Element element) {
-		if (!element.getKind().equals(FIELD)) {
-			messager.printMessage(ERROR, Errors.COLUMN_TYPE_ERROR, element);
-			return false;
-		}
-
 		Table table = enclosingElement.getAnnotation(Table.class);
 		if (!enclosingElement.getKind().equals(CLASS) || table == null) {
 			messager.printMessage(ERROR, "@Column fields can only be enclosed by model classes.", element);

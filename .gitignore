@@ -151,3 +151,6 @@ build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
+
+core/path-journal
+core/path

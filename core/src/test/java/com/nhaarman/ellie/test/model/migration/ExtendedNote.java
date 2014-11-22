@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal.codegen.element;
+package com.nhaarman.ellie.test.model.migration;
 
-import javax.lang.model.element.TypeElement;
+import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.Table;
+import com.nhaarman.ellie.test.model.Note;
 
-public class ModelAdapterElement {
-
-    private final TypeElement mElement;
-
-    public ModelAdapterElement(final TypeElement element) {
-        mElement = element;
-    }
-
-    public String getQualifiedName() {
-        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$ModelAdapter";
-    }
-
-    public String getModelQualifiedName() {
-        return mElement.getQualifiedName().toString();
-    }
+@Table("extended_notes")
+public class ExtendedNote extends Note {
+	@Column("extendedBody")
+	public String extendedBody;
 }

@@ -3,8 +3,8 @@ apply plugin: AndroidStubPlugin
 apply plugin: 'java'
 apply from: '../gradle-mvn-push.gradle'
 
-targetCompatibility = '1.6'
-sourceCompatibility = '1.6'
+targetCompatibility = '1.7'
+sourceCompatibility = '1.7'
 
 def Properties props = new Properties()
 props.load(new FileInputStream(file('../local.properties')))
@@ -31,6 +31,12 @@ dependencies {
 	testCompile 'com.squareup.assertj:assertj-android:1.0.0'
 	testCompile 'junit:junit:4.11'
 	testCompile 'org.robolectric:robolectric:2.3'
+}
+
+test {
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
 }
 
 tasks.withType(Test) {

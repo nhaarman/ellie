@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal.codegen.element;
+package com.nhaarman.ellie.test.content;
 
-import javax.lang.model.element.TypeElement;
+        import com.nhaarman.ellie.Ellie;
+        import com.nhaarman.ellie.EllieProvider;
 
-public class ModelAdapterElement {
 
-    private final TypeElement mElement;
+public class EllieSampleProvider extends EllieProvider {
 
-    public ModelAdapterElement(final TypeElement element) {
-        mElement = element;
+    @Override
+    protected String getDatabaseName() {
+        return "OllieSample.db";
     }
 
-    public String getQualifiedName() {
-        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$ModelAdapter";
+    @Override
+    protected int getDatabaseVersion() {
+        return 1;
     }
 
-    public String getModelQualifiedName() {
-        return mElement.getQualifiedName().toString();
+    @Override
+    protected Ellie.LogLevel getLogLevel() {
+        return Ellie.LogLevel.FULL;
     }
 }

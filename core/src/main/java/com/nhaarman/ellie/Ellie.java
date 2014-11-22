@@ -18,329 +18,316 @@ package com.nhaarman.ellie;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.*;
+import android.database.sqlite.SQLiteCursor;
+import android.database.sqlite.SQLiteCursorDriver;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
-import android.os.Build;
-import android.provider.BaseColumns;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQuery;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
 
 import com.nhaarman.ellie.internal.AdapterHolder;
 import com.nhaarman.ellie.internal.ModelAdapter;
-import com.nhaarman.ellie.util.LruCache;
+import com.nhaarman.ellie.internal.ModelRepository;
+import com.nhaarman.ellie.internal.RepositoryHolder;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class Ellie {
-	public final int DEFAULT_CACHE_SIZE = 1024;
 
-	private static final String TAG = "Ellie";
+    public static final int DEFAULT_CACHE_SIZE = 1024;
 
-	private  Context mContext;
-	private AdapterHolder mAdapterHolder;
-	private  DatabaseHelper mDatabaseHelper;
-	private  SQLiteDatabase mSQLiteDatabase;
-	private  LruCache<String, Model> mStringModelLruCache;
-	private  LogLevel mLogLevel = LogLevel.NONE;
-	private  boolean mInitialized = false;
+    private static final String TAG = "Ellie";
 
-	private static Ellie sInstance;
+    private static Ellie sInstance;
 
-	/**
-	 * Controls the level of logging.
-	 */
-	public enum LogLevel {
-		/**
-		 * No logging.
-		 */
-		NONE,
-		/**
-		 * Log basic events.
-		 */
-		BASIC,
-		/**
-		 * Log all queries.
-		 */
-		FULL;
+    /**
+     * Controls the level of logging.
+     */
+    public enum LogLevel {
+        /**
+         * No logging.
+         */
+        NONE,
+        /**
+         * Log basic events.
+         */
+        BASIC,
+        /**
+         * Log all queries.
+         */
+        FULL;
 
-		public boolean log(LogLevel logLevel) {
-			return this.ordinal() >= logLevel.ordinal();
-		}
-	}
+        public boolean log(final LogLevel logLevel) {
+            return ordinal() >= logLevel.ordinal();
+        }
+    }
 
-	public Ellie() {
-	}
+    private Context mContext;
 
-	public static synchronized Ellie getInstance() {
-		if(sInstance == null){
-			sInstance = new Ellie();
-		}
+    private AdapterHolder mAdapterHolder;
 
-		return sInstance;
-	}
+    private RepositoryHolder mRepositoryHolder;
 
-	// Public methods
+    private SQLiteDatabase mSQLiteDatabase;
 
-	/**
-	 * Initialize the database. Must be called before interacting with the database.
-	 *
-	 * @param context Context
-	 * @param name    The database name.
-	 * @param version The database version.
-	 */
-	public void init(Context context, String name, int version) {
-		init(context, name, version, DEFAULT_CACHE_SIZE, LogLevel.NONE);
-	}
+    private LogLevel mLogLevel = LogLevel.NONE;
 
-	/**
-	 * Initialize the database. Must be called before interacting with the database.
-	 *
-	 * @param context   Context
-	 * @param name      The database name.
-	 * @param version   The database version.
-	 * @param cacheSize The cache size.
-	 */
-	public void init(Context context, String name, int version, int cacheSize) {
-		init(context, name, version, cacheSize, LogLevel.NONE);
-	}
+    private boolean mInitialized;
 
-	/**
-	 * Initialize the database. Must be called before interacting with the database.
-	 *
-	 * @param context  Context
-	 * @param name     The database name.
-	 * @param version  The database version.
-	 * @param logLevel The logging level.
-	 */
-	public void init(Context context, String name, int version, LogLevel logLevel) {
-		init(context, name, version, DEFAULT_CACHE_SIZE, logLevel);
-	}
+    public Ellie() {
+    }
 
-	/**
-	 * Initialize the database. Must be called before interacting with the database.
-	 *
-	 * @param context   Context
-	 * @param name      The database name.
-	 * @param version   The database version.
-	 * @param cacheSize The cache size.
-	 * @param logLevel  The logging level.
-	 */
-	public void init(Context context, String name, int version, int cacheSize, LogLevel logLevel) {
-		mLogLevel = logLevel;
+    public static Ellie getInstance() {
+        synchronized (Ellie.class) {
+            if (sInstance == null) {
+                sInstance = new Ellie();
+            }
 
-		if (mInitialized) {
-			if (mLogLevel.log(LogLevel.BASIC)) {
-				Log.d(TAG, "Already initialized.");
-			}
-			return;
-		}
+            return sInstance;
+        }
+    }
 
-		try {
-			Class adapterClass = Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
-			mAdapterHolder = (AdapterHolder) adapterClass.newInstance();
-		} catch (Exception e) {
-			if (mLogLevel.log(LogLevel.BASIC)) {
-				Log.e(TAG, "Failed to initialize.", e);
-			}
-		}
+    // Public methods
 
-		mContext = context.getApplicationContext();
-		mDatabaseHelper = new DatabaseHelper(mContext, name, version);
-		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
-		mStringModelLruCache = new LruCache<String, Model>(cacheSize);
+    /**
+     * Initialize the database. Must be called before interacting with the database.
+     *
+     * @param context Context
+     * @param name    The database name.
+     * @param version The database version.
+     */
+    public void init(final Context context, final String name, final int version) {
+        init(context, name, version, DEFAULT_CACHE_SIZE, LogLevel.NONE);
+    }
 
-		mInitialized = true;
-	}
+    /**
+     * Initialize the database. Must be called before interacting with the database.
+     *
+     * @param context   Context
+     * @param name      The database name.
+     * @param version   The database version.
+     * @param cacheSize The cache size.
+     */
+    public void init(final Context context, final String name, final int version, final int cacheSize) {
+        init(context, name, version, cacheSize, LogLevel.NONE);
+    }
 
-	public Context getContext() {
-		return mContext;
-	}
+    /**
+     * Initialize the database. Must be called before interacting with the database.
+     *
+     * @param context  Context
+     * @param name     The database name.
+     * @param version  The database version.
+     * @param logLevel The logging level.
+     */
+    public void init(final Context context, final String name, final int version, final LogLevel logLevel) {
+        init(context, name, version, DEFAULT_CACHE_SIZE, logLevel);
+    }
 
-	public SQLiteDatabase getDatabase() {
-		return mSQLiteDatabase;
-	}
+    /**
+     * Initialize the database. Must be called before interacting with the database.
+     *
+     * @param context   Context
+     * @param name      The database name.
+     * @param version   The database version.
+     * @param cacheSize The cache size.
+     * @param logLevel  The logging level.
+     */
+    public void init(final Context context, final String name, final int version, final int cacheSize, final LogLevel logLevel) {
+        if (mInitialized) {
+            if (logLevel.log(LogLevel.BASIC)) {
+                Log.d(TAG, "Already initialized.");
+            }
+            return;
+        }
 
-	public <T extends Model> String getTableName(Class<T> cls) {
-		return mAdapterHolder.getModelAdapter(cls).getTableName();
-	}
+        mContext = context.getApplicationContext();
+        mLogLevel = logLevel;
 
-	// Convenience methods
+        try {
+            Class adapterHolderClass = Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
+            mAdapterHolder = (AdapterHolder) adapterHolderClass.newInstance();
+        } catch (Exception e) {
+            if (mLogLevel.log(LogLevel.BASIC)) {
+                Log.e(TAG, "Failed to initialize.", e);
+            }
+            throw new RuntimeException(e);
+        }
 
-	/**
-	 * Iterate over a cursor and load entities.
-	 *
-	 * @param cls    The model class.
-	 * @param cursor The result cursor.
-	 * @return The list of entities.
-	 */
-	public <T extends Model> List<T> processCursor(Class<T> cls, Cursor cursor) {
-		final List<T> entities = new ArrayList<T>();
-		try {
-			Constructor<T> entityConstructor = cls.getConstructor();
-			if (cursor.moveToFirst()) {
-				do {
-					T entity = getEntity(cls, cursor.getLong(cursor.getColumnIndex(BaseColumns._ID)));
-					if (entity == null) {
-						entity = entityConstructor.newInstance();
-					}
+        DatabaseHelper databaseHelper = new DatabaseHelper(mContext, name, version);
+        mSQLiteDatabase = databaseHelper.getWritableDatabase();
 
-					entity.load(cursor);
-					entities.add(entity);
-				}
-				while (cursor.moveToNext());
-			}
-		} catch (Exception e) {
-			Log.e(TAG, "Failed to process cursor.", e);
-		}
+        try {
+            Class adapterHolderClass = Class.forName(RepositoryHolder.IMPL_CLASS_FQCN);
+            mRepositoryHolder = (RepositoryHolder) adapterHolderClass.getConstructor(Ellie.class, SQLiteDatabase.class, int.class).newInstance(this, mSQLiteDatabase, cacheSize);
+        } catch (Exception e) {
+            if (mLogLevel.log(LogLevel.BASIC)) {
+                Log.e(TAG, "Failed to initialize.", e);
+            }
+            throw new RuntimeException(e);
+        }
 
-		return entities;
-	}
+        mInitialized = true;
+    }
 
-	/**
-	 * Iterate over a cursor and load entities. Closes the cursor when finished.
-	 *
-	 * @param cls    The model class.
-	 * @param cursor The result cursor.
-	 * @return The list of entities.
-	 */
-	public <T extends Model> List<T> processAndCloseCursor(Class<T> cls, Cursor cursor) {
-		List<T> entities = processCursor(cls, cursor);
-		cursor.close();
-		return entities;
-	}
+    public Context getContext() {
+        return mContext;
+    }
 
-	// Finder methods
+    public SQLiteDatabase getDatabase() {
+        return mSQLiteDatabase;
+    }
 
-	<D, S> TypeAdapter<D, S> getTypeAdapter(Class<D> cls) {
-		return (TypeAdapter<D, S>) mAdapterHolder.getTypeAdapter(cls);
-	}
+    public <T extends Model> String getTableName(final Class<T> cls) {
+        return mAdapterHolder.getModelAdapter(cls).getTableName();
+    }
 
-	List<? extends ModelAdapter> getModelAdapters() {
-		return mAdapterHolder.getModelAdapters();
-	}
+    // Convenience methods
 
-	// Cache methods
+    /**
+     * Iterate over a cursor and load entities.
+     *
+     * @param cls    The model class.
+     * @param cursor The result cursor.
+     *
+     * @return The list of entities.
+     */
+    public <T extends Model> List<T> processCursor(final Class<T> cls, final Cursor cursor) {
+        final List<T> entities = new ArrayList<T>();
+        try {
+            Constructor<T> entityConstructor = cls.getConstructor();
+            if (cursor.moveToFirst()) {
+                do {
+                    T entity = getModelRepository(cls).getEntity(cursor.getLong(cursor.getColumnIndex(Model.COLUMN_ID)));
+                    if (entity == null) {
+                        entity = entityConstructor.newInstance();
+                    }
 
-	synchronized <T extends Model> void putEntity(T entity) {
-		if (entity.id != null) {
-			mStringModelLruCache.put(getEntityIdentifier(entity.getClass(), entity.id), entity);
-		}
-	}
+                    entity.load(cursor);
+                    entities.add(entity);
+                }
+                while (cursor.moveToNext());
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
 
-	synchronized <T extends Model> T getEntity(Class<T> cls, long id) {
-		return (T) mStringModelLruCache.get(getEntityIdentifier(cls, id));
-	}
+        return entities;
+    }
 
-	synchronized <T extends Model> void removeEntity(T entity) {
-		mStringModelLruCache.remove(getEntityIdentifier(entity.getClass(), entity.id));
-	}
+    /**
+     * Iterate over a cursor and load entities. Closes the cursor when finished.
+     *
+     * @param cls    The model class.
+     * @param cursor The result cursor.
+     *
+     * @return The list of entities.
+     */
+    public <T extends Model> List<T> processAndCloseCursor(final Class<T> cls, final Cursor cursor) {
+        List<T> entities = processCursor(cls, cursor);
+        cursor.close();
+        return entities;
+    }
 
-	synchronized <T extends Model> T getOrFindEntity(Class<T> cls, long id) {
-		T entity = getEntity(cls, id);
-		if (entity == null) {
-			entity = Model.find(cls, id);
-		}
-		return entity;
-	}
+    // Finder methods
 
-	// Model adapter methods
+    List<? extends ModelAdapter> getModelAdapters() {
+        return mAdapterHolder.getModelAdapters();
+    }
 
-	synchronized <T extends Model> void load(T entity, Cursor cursor) {
-		mAdapterHolder.getModelAdapter(entity.getClass()).load(entity, cursor);
-	}
+    public <T extends Model> ModelRepository<T> getModelRepository(final Class<T> cls) {
+        return mRepositoryHolder.getModelRepository(cls);
+    }
 
-	synchronized <T extends Model> Long save(T entity) {
-		return mAdapterHolder.getModelAdapter(entity.getClass()).save(entity, mSQLiteDatabase);
-	}
+    <D, S> TypeAdapter<D, S> getTypeAdapter(final Class<D> cls) {
+        return (TypeAdapter<D, S>) mAdapterHolder.getTypeAdapter(cls);
+    }
 
-	synchronized <T extends Model> void delete(T entity) {
-		mAdapterHolder.getModelAdapter(entity.getClass()).delete(entity, mSQLiteDatabase);
-	}
+    // Private classes
 
-	// Private methods
+    private class DatabaseHelper extends SQLiteOpenHelper {
 
-	private static String getEntityIdentifier(Class<? extends Model> cls, long id) {
-		return cls.getName() + "@" + id;
-	}
+        DatabaseHelper(final Context context, final String name, final int version) {
+            super(context, name, mLogLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);
+        }
 
-	// Private classes
+        @Override
+        public void onOpen(final SQLiteDatabase db) {
+            executePragmas(db);
+        }
 
-	private final class DatabaseHelper extends SQLiteOpenHelper {
-		public DatabaseHelper(Context context, String name, int version) {
-			super(context, name, mLogLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);
-		}
+        @Override
+        public void onCreate(final SQLiteDatabase sqLiteDatabase) {
+            executePragmas(sqLiteDatabase);
+            executeCreate(sqLiteDatabase);
+            executeMigrations(sqLiteDatabase, -1, sqLiteDatabase.getVersion());
+        }
 
-		@Override
-		public void onOpen(SQLiteDatabase db) {
-			executePragmas(db);
-		}
+        @Override
+        public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
+            executePragmas(sqLiteDatabase);
+            executeCreate(sqLiteDatabase);
+            executeMigrations(sqLiteDatabase, oldVersion, newVersion);
+        }
 
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			executePragmas(db);
-			executeCreate(db);
-			executeMigrations(db, -1, db.getVersion());
-		}
+        private void executePragmas(final SQLiteDatabase db) {
+            if (VERSION.SDK_INT >= VERSION_CODES.FROYO) {
+                db.execSQL("PRAGMA foreign_keys=ON;");
+            }
+        }
 
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			executePragmas(db);
-			executeCreate(db);
-			executeMigrations(db, oldVersion, newVersion);
-		}
+        private void executeCreate(final SQLiteDatabase db) {
+            final List<String> tableDefinitions = new ArrayList<String>();
+            for (ModelAdapter<?> modelAdapter : mAdapterHolder.getModelAdapters()) {
+                tableDefinitions.add(modelAdapter.getSchema());
+            }
 
-		private void executePragmas(SQLiteDatabase db) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
-				db.execSQL("PRAGMA foreign_keys=ON;");
-			}
-		}
+            db.beginTransaction();
+            try {
+                for (String tableDefinition : tableDefinitions) {
+                    db.execSQL(tableDefinition);
+                }
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        }
 
-		private void executeCreate(SQLiteDatabase db) {
-			final List<String> tableDefinitions = new ArrayList<String>();
-			for (ModelAdapter modelAdapter : mAdapterHolder.getModelAdapters()) {
-				tableDefinitions.add(modelAdapter.getSchema());
-			}
+        private boolean executeMigrations(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+            boolean migrationExecuted = false;
+            final List<? extends Migration> migrations = mAdapterHolder.getMigrations();
 
-			db.beginTransaction();
-			try {
-				for (String tableDefinition : tableDefinitions) {
-					db.execSQL(tableDefinition);
-				}
-				db.setTransactionSuccessful();
-			} finally {
-				db.endTransaction();
-			}
-		}
+            db.beginTransaction();
+            try {
+                for (Migration migration : migrations) {
+                    if (migration.getVersion() > oldVersion && migration.getVersion() <= newVersion) {
+                        for (String statement : migration.getStatements()) {
+                            db.execSQL(statement);
+                        }
+                        migrationExecuted = true;
+                    }
+                }
+            } finally {
+                db.setTransactionSuccessful();
+            }
+            db.endTransaction();
 
-		private boolean executeMigrations(SQLiteDatabase db, int oldVersion, int newVersion) {
-			boolean migrationExecuted = false;
-			final List<? extends Migration> migrations = mAdapterHolder.getMigrations();
+            return migrationExecuted;
+        }
+    }
 
-			db.beginTransaction();
-			try {
-				for (Migration migration : migrations) {
-					if (migration.getVersion() > oldVersion && migration.getVersion() <= newVersion) {
-						for (String statement : migration.getStatements()) {
-							db.execSQL(statement);
-						}
-						migrationExecuted = true;
-					}
-				}
-			} finally {
-				db.setTransactionSuccessful();
-			}
-			db.endTransaction();
+    private static class LoggingCursorAdapter implements CursorFactory {
 
-			return migrationExecuted;
-		}
-	}
-
-	private static final class LoggingCursorAdapter implements CursorFactory {
-		@Override
-		public Cursor newCursor(SQLiteDatabase db, SQLiteCursorDriver driver, String editTable, SQLiteQuery query) {
-			Log.v(TAG, query.toString());
-			return new SQLiteCursor(db, driver, editTable, query);
-		}
-	}
+        @Override
+        public Cursor newCursor(final SQLiteDatabase sqLiteDatabase, final SQLiteCursorDriver sqLiteCursorDriver, final String editTable, final SQLiteQuery sqLiteQuery) {
+            Log.v(TAG, sqLiteQuery.toString());
+            return new SQLiteCursor(sqLiteDatabase, sqLiteCursorDriver, editTable, sqLiteQuery);
+        }
+    }
 }

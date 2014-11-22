@@ -19,115 +19,103 @@ package com.nhaarman.ellie;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import com.nhaarman.ellie.annotation.Column;
-import com.nhaarman.ellie.query.Select;
 import com.nhaarman.ellie.annotation.AutoIncrement;
+import com.nhaarman.ellie.annotation.Column;
 import com.nhaarman.ellie.annotation.PrimaryKey;
-import com.nhaarman.ellie.annotation.Table;
+import com.nhaarman.ellie.internal.ModelRepository;
 
 /**
  * A Model represents a single table record and uses annotations to define the table's schema. The Model contains
  * methods for interacting with the database directly.
  */
-@Table("")
 public abstract class Model {
-	public static final String _ID = BaseColumns._ID;
 
-	@Column(_ID)
-	@PrimaryKey
-	@AutoIncrement
-	public Long id;
+    public static final String COLUMN_ID = BaseColumns._ID;
 
-	/**
-	 * The Ellie instance we're using.
-	 */
-	private final Ellie mEllie;
+    @SuppressWarnings("rawtypes")
+    private final ModelRepository mRepository;
 
-	protected Model() {
-		mEllie = Ellie.getInstance();
-	}
+    @Column(COLUMN_ID)
+    @PrimaryKey
+    @AutoIncrement
+    public Long id;
 
-	protected Model(Ellie ellie){
-		mEllie = ellie;
-	}
+    protected Model() {
+        mRepository = Ellie.getInstance().getModelRepository(getClass());
+    }
 
-	/**
-	 * <p>
-	 * Find a record by id.
-	 * </p>
-	 *
-	 * @param cls The model class.
-	 * @param id  The model Id.
-	 * @return The query result.
-	 */
-	public static final <T extends Model> T find(Class<T> cls, Long id) {
-		return new Select().from(cls).where(_ID + "=?", id).fetchSingle();
-	}
+    protected Model(final ModelRepository<? extends Model> repository) {
+        mRepository = repository;
+    }
 
-	/**
-	 * <p>
-	 * Load this objects values from a cursor.
-	 * </p>
-	 *
-	 * @param cursor
-	 */
-	public final void load(Cursor cursor) {
-		mEllie.load(this, cursor);
-		mEllie.putEntity(this);
-	}
+    /**
+     * <p>
+     * Load this objects values from a cursor.
+     * </p>
+     *
+     * @param cursor
+     */
+    public final void load(final Cursor cursor) {
+        mRepository.load(this, cursor);
+        mRepository.putEntity(this);
+    }
 
-	/**
-	 * <p>
-	 * Persist the record to the database. Inserts the record if it does not exists and updates the record if it
-	 * does exists.
-	 * </p>
-	 *
-	 * @return The record id.
-	 */
-	public final Long save() {
-		id = mEllie.save(this);
-		mEllie.putEntity(this);
-		notifyChange();
-		return id;
-	}
+    /**
+     * <p>
+     * Persist the record to the database. Inserts the record if it does not exists and updates the record if it
+     * does exists.
+     * </p>
+     *
+     * @return The record id.
+     */
+    public final Long save() {
+        if (id == null) {
+            id = mRepository.create(this);
+        } else {
+            mRepository.update(this);
+        }
+        mRepository.putEntity(this);
+        notifyChange();
+        return id;
+    }
 
-	/**
-	 * <p>
-	 * Delete the record from the database.
-	 * </p>
-	 */
-	public final void delete() {
-		mEllie.delete(this);
-		mEllie.removeEntity(this);
-		notifyChange();
-		id = null;
-	}
+    /**
+     * <p>
+     * Delete the record from the database.
+     * </p>
+     */
+    public final void delete() {
+        mRepository.delete(this);
+        mRepository.removeEntity(this);
+        notifyChange();
+        id = null;
+    }
 
-	/**
-	 * <p>
-	 * Notify observers that this record has changed.
-	 * </p>
-	 */
-	private void notifyChange() {
+    /**
+     * <p>
+     * Notify observers that this record has changed.
+     * </p>
+     */
+    private void notifyChange() {
 //		if (EllieProvider.isImplemented()) {
 //			mEllie.getContext().getContentResolver().notifyChange(EllieProvider.createUri(getClass(), id), null);
 //		}
-	}
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Model && id != null) {
-			final Model other = (Model) obj;
-			return mEllie.getTableName(getClass()).equals(mEllie.getTableName(other.getClass())) && id.equals(other.id);
-		}
-		return this == obj;
-	}
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Model && id != null) {
+            final Model other = (Model) obj;
+            return getClass().equals(other.getClass()) && id.equals(other.id);
+        }
+        return this == obj;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 1;
-		hash = hash * 17 + getClass().getName().hashCode();
-		hash = hash * 31 + (id != null ? id.intValue() : super.hashCode());
-		return hash;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 1;
+        hash = hash * 17 + getClass().getName().hashCode();
+        hash = hash * 31 + (id != null ? id.intValue() : super.hashCode());
+        return hash;
+    }
 }

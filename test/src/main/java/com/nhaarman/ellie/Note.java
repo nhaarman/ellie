@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal.codegen.element;
+package com.nhaarman.ellie;
 
-import javax.lang.model.element.TypeElement;
+import com.nhaarman.ellie.Model;
+import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.NotNull;
+import com.nhaarman.ellie.annotation.Table;
 
-public class ModelAdapterElement {
+import java.util.Date;
 
-    private final TypeElement mElement;
+@Table("notes")
+public class Note extends Model {
 
-    public ModelAdapterElement(final TypeElement element) {
-        mElement = element;
-    }
+    public static final String TITLE = "title";
+    public static final String BODY = "body";
+    public static final String DATE = "date";
 
-    public String getQualifiedName() {
-        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$ModelAdapter";
-    }
+    @Column(TITLE)
+    public String title;
 
-    public String getModelQualifiedName() {
-        return mElement.getQualifiedName().toString();
-    }
+    @Column(BODY)
+    @NotNull
+    public String body;
+
+    @Column(DATE)
+    public Date date;
 }

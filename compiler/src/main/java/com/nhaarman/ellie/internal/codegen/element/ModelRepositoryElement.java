@@ -18,16 +18,16 @@ package com.nhaarman.ellie.internal.codegen.element;
 
 import javax.lang.model.element.TypeElement;
 
-public class ModelAdapterElement {
+public class ModelRepositoryElement {
 
     private final TypeElement mElement;
 
-    public ModelAdapterElement(final TypeElement element) {
+    public ModelRepositoryElement(final TypeElement element) {
         mElement = element;
     }
 
     public String getQualifiedName() {
-        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$ModelAdapter";
+        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$Repository";
     }
 
     public String getModelQualifiedName() {

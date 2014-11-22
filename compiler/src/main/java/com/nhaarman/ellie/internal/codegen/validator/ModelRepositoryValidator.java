@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal.codegen.writer;
+package com.nhaarman.ellie.internal.codegen.validator;
 
+import com.nhaarman.ellie.internal.codegen.Registry;
+
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 
-import java.io.IOException;
-import java.io.Writer;
+import static javax.lang.model.element.ElementKind.CLASS;
+import static javax.tools.Diagnostic.Kind.ERROR;
 
-public interface SourceWriter<T extends Element> {
+public class ModelRepositoryValidator implements Validator {
 
-    String createSourceName(T element);
+    private final Messager mMessager;
 
-    void writeSource(Writer writer, T element) throws IOException;
+    public ModelRepositoryValidator(final Registry registry) {
+        mMessager = registry.getMessager();
+    }
+
+    @Override
+    public boolean validate(final Element enclosingElement, final Element element) {
+        return true;
+    }
 }

@@ -26,15 +26,16 @@ import java.util.List;
  * Used internally to hold mapping information.
  */
 public interface AdapterHolder {
-	public static final String IMPL_CLASS_PACKAGE = "com.nhaarman.ellie";
-	public static final String IMPL_CLASS_NAME = "AdapterHolderImpl";
-	public static final String IMPL_CLASS_FQCN = IMPL_CLASS_PACKAGE + "." + IMPL_CLASS_NAME;
 
-	public List<? extends Migration> getMigrations();
+    String IMPL_CLASS_PACKAGE = "com.nhaarman.ellie";
+    String IMPL_CLASS_NAME = "AdapterHolderImpl";
+    String IMPL_CLASS_FQCN = IMPL_CLASS_PACKAGE + "." + IMPL_CLASS_NAME;
 
-	public <T extends Model> ModelAdapter<T> getModelAdapter(Class<? extends Model> cls);
+    List<? extends Migration> getMigrations();
 
-	public List<? extends ModelAdapter> getModelAdapters();
+    <T extends Model> ModelAdapter<T> getModelAdapter(Class<? extends Model> cls);
 
-	public <D, S> TypeAdapter<D, S> getTypeAdapter(Class<D> cls);
+    List<? extends ModelAdapter> getModelAdapters();
+
+    <D, S> TypeAdapter<D, S> getTypeAdapter(Class<D> cls);
 }

@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal.codegen.element;
+package com.nhaarman.ellie.test.model;
 
-import javax.lang.model.element.TypeElement;
+import com.nhaarman.ellie.Model;
+import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.ForeignKey;
+import com.nhaarman.ellie.annotation.Table;
 
-public class ModelAdapterElement {
+import static com.nhaarman.ellie.annotation.ForeignKey.ReferentialAction.CASCADE;
 
-    private final TypeElement mElement;
+@Table("noteTags")
+public class NoteTag extends Model {
 
-    public ModelAdapterElement(final TypeElement element) {
-        mElement = element;
-    }
+	public static final String NOTE = "note";
+	public static final String TAG = "tag";
 
-    public String getQualifiedName() {
-        return "com.nhaarman.ellie." + mElement.getSimpleName() + "$$ModelAdapter";
-    }
+	@Column(NOTE)
+	@ForeignKey(onDelete = CASCADE)
+	public Note note;
 
-    public String getModelQualifiedName() {
-        return mElement.getQualifiedName().toString();
-    }
+	@Column(TAG)
+	@ForeignKey(onDelete = CASCADE)
+	public Tag tag;
 }
