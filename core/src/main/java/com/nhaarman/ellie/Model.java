@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +24,6 @@ import com.nhaarman.ellie.annotation.AutoIncrement;
 import com.nhaarman.ellie.annotation.Column;
 import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.PrimaryKey;
-import com.nhaarman.ellie.internal.ModelRepository;
 
 /**
  * A Model represents a single table record and uses annotations to define the table's schema. The Model contains
@@ -36,9 +36,7 @@ public abstract class Model {
     @SuppressWarnings("rawtypes")
     private final ModelRepository mRepository;
 
-    @Column(COLUMN_ID)
-    @PrimaryKey
-    @AutoIncrement
+    @Column(COLUMN_ID) @PrimaryKey @AutoIncrement
     protected Long mId;
 
     protected Model() {
@@ -55,7 +53,7 @@ public abstract class Model {
     }
 
     public void setId(final Long id) {
-        this.mId = id;
+        mId = id;
     }
 
     /**
@@ -63,7 +61,7 @@ public abstract class Model {
      * Load this objects values from a cursor.
      * </p>
      *
-     * @param cursor
+     * @param cursor The Cursor to load values from.
      */
     public final void load(final Cursor cursor) {
         mRepository.load(this, cursor);

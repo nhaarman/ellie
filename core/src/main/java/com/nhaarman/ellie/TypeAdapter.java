@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +41,7 @@ import com.nhaarman.ellie.adapter.UtilDateAdapter;
  *
  * @param <D> Deserialized type, i.e. the Java type.
  * @param <S> Serialized type, i.e. the SQLite type.
+ *
  * @see BooleanAdapter
  * @see CalendarAdapter
  * @see SqlDateAdapter
@@ -47,19 +49,22 @@ import com.nhaarman.ellie.adapter.UtilDateAdapter;
  */
 @com.nhaarman.ellie.internal.TypeAdapter
 public abstract class TypeAdapter<D, S> {
-	/**
-	 * Converts the Java value to a value which SQLite can store.
-	 *
-	 * @param value The Java (deserialized) value.
-	 * @return The SQLite value, converted from the Java value.
-	 */
-	public abstract S serialize(D value);
 
-	/**
-	 * Converts the SQLite value to the Java representation of that value.
-	 *
-	 * @param value The SQLite (serialized) value.
-	 * @return The Java value, converted from the SQLite value.
-	 */
-	public abstract D deserialize(S value);
+    /**
+     * Converts the Java value to a value which SQLite can store.
+     *
+     * @param value The Java (deserialized) value.
+     *
+     * @return The SQLite value, converted from the Java value.
+     */
+    public abstract S serialize(D value);
+
+    /**
+     * Converts the SQLite value to the Java representation of that value.
+     *
+     * @param value The SQLite (serialized) value.
+     *
+     * @return The Java value, converted from the SQLite value.
+     */
+    public abstract D deserialize(S value);
 }

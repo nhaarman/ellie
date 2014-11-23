@@ -15,24 +15,11 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal;
+package com.nhaarman.ellie.query;
 
-import com.nhaarman.ellie.Model;
-import com.nhaarman.ellie.ModelRepository;
+public class MalformedQueryException extends RuntimeException {
 
-import java.util.List;
-
-/**
- * Used internally to create and store ModelRepository instances.
- */
-public interface RepositoryHolder {
-
-    String IMPL_CLASS_PACKAGE = "com.nhaarman.ellie";
-    String IMPL_CLASS_NAME = "RepositoryHolderImpl";
-    String IMPL_CLASS_FQCN = IMPL_CLASS_PACKAGE + "." + IMPL_CLASS_NAME;
-
-    <T extends Model> ModelRepository<T> getModelRepository(Class<? extends Model> cls);
-
-    List<? extends ModelRepository> getModelRepositories();
-
+    public MalformedQueryException(final String detailMessage) {
+        super(detailMessage);
+    }
 }

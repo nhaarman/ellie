@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,65 +20,68 @@ package com.nhaarman.ellie.query;
 import com.nhaarman.ellie.Model;
 
 public abstract class QueryBase implements Query {
-	protected Query mParent;
-	protected Class<? extends Model> mTable;
 
-	public QueryBase(Query parent, Class<? extends Model> table) {
-		mParent = parent;
-		mTable = table;
-	}
+    protected Query mParent;
+    protected Class<? extends Model> mTable;
 
-	@Override
-	public final String getSql() {
-		if (mParent != null) {
-			return mParent.getSql() + " " + getPartSql().trim();
-		}
-		return getPartSql().trim();
-	}
+    protected QueryBase(final Query parent, final Class<? extends Model> table) {
+        mParent = parent;
+        mTable = table;
+    }
 
-	@Override
-	public final String[] getArgs() {
-		if (mParent != null) {
-			return join(mParent.getArgs(), getPartArgs());
-		}
-		return getPartArgs();
-	}
+    @Override
+    public final String getSql() {
+        if (mParent != null) {
+            return mParent.getSql() + " " + getPartSql().trim();
+        }
+        return getPartSql().trim();
+    }
 
-	protected String getPartSql() {
-		return null;
-	}
+    @Override
+    public final String[] getArgs() {
+        if (mParent != null) {
+            return join(mParent.getArgs(), getPartArgs());
+        }
+        return getPartArgs();
+    }
 
-	protected String[] getPartArgs() {
-		return null;
-	}
+    protected String getPartSql() {
+        return null;
+    }
 
-	protected final String[] toStringArray(final Object[] array) {
-		if (array == null) {
-			return null;
-		}
-		final String[] transformedArray = new String[array.length];
-		for (int i = 0; i < array.length; i++) {
-			transformedArray[i] = String.valueOf(array[i]);
-		}
-		return transformedArray;
-	}
+    protected String[] getPartArgs() {
+        return null;
+    }
 
-	private final String[] join(final String[] array1, final String... array2) {
-		if (array1 == null) {
-			return clone(array2);
-		} else if (array2 == null) {
-			return clone(array1);
-		}
-		final String[] joinedArray = new String[array1.length + array2.length];
-		System.arraycopy(array1, 0, joinedArray, 0, array1.length);
-		System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
-		return joinedArray;
-	}
+    protected final String[] toStringArray(final Object[] array) {
+        if (array == null) {
+            return null;
+        }
+        final String[] transformedArray = new String[array.length];
+        for (int i = 0; i < array.length; i++) {
+            transformedArray[i] = String.valueOf(array[i]);
+        }
+        return transformedArray;
+    }
 
-	private final String[] clone(final String[] array) {
-		if (array == null) {
-			return null;
-		}
-		return array.clone();
-	}
+    private  String[] join(final String[] array1, final String... array2) {
+        if (array1 == null) {
+            return clone(array2);
+        }
+        if (array2 == null) {
+            return clone(array1);
+        }
+
+        final String[] joinedArray = new String[array1.length + array2.length];
+        System.arraycopy(array1, 0, joinedArray, 0, array1.length);
+        System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
+        return joinedArray;
+    }
+
+    private String[] clone(final String[] array) {
+        if (array == null) {
+            return null;
+        }
+        return array.clone();
+    }
 }

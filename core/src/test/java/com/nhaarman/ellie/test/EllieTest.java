@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,7 @@ import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.query.Delete;
 import com.nhaarman.ellie.query.Insert;
+import com.nhaarman.ellie.query.MalformedQueryException;
 import com.nhaarman.ellie.query.Query;
 import com.nhaarman.ellie.query.Select;
 import com.nhaarman.ellie.query.Update;
@@ -220,7 +222,7 @@ public class EllieTest {
                     "Testing INSERT body."
             ).execute();
             assert false;
-        } catch (Query.MalformedQueryException e) {
+        } catch (MalformedQueryException ignored) {
             // Successfully threw exception
             assert true;
         }

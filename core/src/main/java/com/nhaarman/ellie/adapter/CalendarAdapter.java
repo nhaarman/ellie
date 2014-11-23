@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,33 +27,36 @@ import java.util.Calendar;
  * </p>
  */
 public class CalendarAdapter extends TypeAdapter<Calendar, Long> {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Long serialize(Calendar value) {
-		if (value != null) {
-			return value.getTimeInMillis();
-		}
-		return null;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Calendar deserialize(Long value) {
-		if (value != null) {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(value);
-			return calendar;
-		}
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Long serialize(Calendar value) {
+        if (value != null) {
+            return value.getTimeInMillis();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Calendar deserialize(Long value) {
+        if (value != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(value);
+            return calendar;
+        }
+        return null;
+    }
 }

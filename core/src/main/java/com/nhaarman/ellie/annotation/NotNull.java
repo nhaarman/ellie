@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +41,11 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target(FIELD)
 @Retention(CLASS)
 public @interface NotNull {
-	/**
-	 * Returns a behaviour when the operation encounters a conflict.
-	 *
-	 * @return The conflict clause.
-	 */
-	public ConflictClause value() default ConflictClause.NONE;
+
+    /**
+     * Returns a behaviour when the operation encounters a conflict.
+     *
+     * @return The conflict clause.
+     */
+    public ConflictClause value() default ConflictClause.NONE;
 }

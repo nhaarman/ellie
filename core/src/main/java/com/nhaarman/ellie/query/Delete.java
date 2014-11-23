@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,74 +17,75 @@
 
 package com.nhaarman.ellie.query;
 
-import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.Ellie;
+import com.nhaarman.ellie.Model;
 
 public final class Delete extends QueryBase {
 
-	private Ellie mEllie;
+    private Ellie mEllie;
 
-	public Delete() {
-		super(null, null);
-		mEllie = Ellie.getInstance();
-	}
+    public Delete() {
+        super(null, null);
+        mEllie = Ellie.getInstance();
+    }
 
-	public Delete with(Ellie ellie) {
-		mEllie = ellie;
-		return this;
-	}
+    public Delete with(final Ellie ellie) {
+        mEllie = ellie;
+        return this;
+    }
 
-	public From from(Class<? extends Model> table) {
-		return new From(this, table);
-	}
+    public From from(final Class<? extends Model> table) {
+        return new From(this, table);
+    }
 
-	@Override
-	public String getPartSql() {
-		return "DELETE";
-	}
+    @Override
+    public String getPartSql() {
+        return "DELETE";
+    }
 
-	private Ellie getEllie() {
-		return mEllie;
-	}
+    private Ellie getEllie() {
+        return mEllie;
+    }
 
-	public static final class From extends ExecutableQueryBase {
+    public static final class From extends ExecutableQueryBase {
 
-		private From(Delete parent, Class<? extends Model> table) {
-			super(parent, table);
-		}
+        private From(final Delete parent, final Class<? extends Model> table) {
+            super(parent, table);
+        }
 
-		public Where where(String where) {
-			return where(where, (Object[]) null);
-		}
+        public Where where(final String where) {
+            return where(where, (Object[]) null);
+        }
 
-		public Where where(String where, Object... args) {
-			return new Where(this, mTable, where, args);
-		}
+        public Where where(final String where, final Object... args) {
+            return new Where(this, mTable, where, args);
+        }
 
-		@Override
-		public String getPartSql() {
-			return "FROM " + ((Delete) mParent).getEllie().getTableName(mTable);
-		}
-	}
+        @Override
+        public String getPartSql() {
+            return "FROM " + ((Delete) mParent).getEllie().getTableName(mTable);
+        }
+    }
 
-	public static final class Where extends ExecutableQueryBase {
-		private String mWhere;
-		private Object[] mWhereArgs;
+    public static final class Where extends ExecutableQueryBase {
 
-		public Where(Query parent, Class<? extends Model> table, String where, Object[] args) {
-			super(parent, table);
-			mWhere = where;
-			mWhereArgs = args;
-		}
+        private final String mWhere;
+        private final Object[] mWhereArgs;
 
-		@Override
-		public String getPartSql() {
-			return "WHERE " + mWhere;
-		}
+        public Where(final Query parent, final Class<? extends Model> table, final String where, final Object[] args) {
+            super(parent, table);
+            mWhere = where;
+            mWhereArgs = args;
+        }
 
-		@Override
-		public String[] getPartArgs() {
-			return toStringArray(mWhereArgs);
-		}
-	}
+        @Override
+        public String getPartSql() {
+            return "WHERE " + mWhere;
+        }
+
+        @Override
+        public String[] getPartArgs() {
+            return toStringArray(mWhereArgs);
+        }
+    }
 }

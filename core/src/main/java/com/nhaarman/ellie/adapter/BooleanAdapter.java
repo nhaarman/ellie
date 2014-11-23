@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +25,28 @@ import com.nhaarman.ellie.TypeAdapter;
  * </p>
  */
 public class BooleanAdapter extends TypeAdapter<Boolean, Integer> {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Integer serialize(Boolean value) {
-		return value ? 1 : 0;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Boolean deserialize(Integer value) {
-		return value != 0;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Integer serialize(Boolean value) {
+        return value ? 1 : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Boolean deserialize(Integer value) {
+        return value != 0;
+    }
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,31 +27,34 @@ import java.sql.Date;
  * </p>
  */
 public class SqlDateAdapter extends TypeAdapter<Date, Long> {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Long serialize(Date value) {
-		if (value != null) {
-			return value.getTime();
-		}
-		return null;
-	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param value {@inheritDoc}
-	 * @return {@inheritDoc}
-	 */
-	@Override
-	public Date deserialize(Long value) {
-		if (value != null) {
-			return new Date(value);
-		}
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Long serialize(Date value) {
+        if (value != null) {
+            return value.getTime();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param value {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Date deserialize(Long value) {
+        if (value != null) {
+            return new Date(value);
+        }
+        return null;
+    }
 }

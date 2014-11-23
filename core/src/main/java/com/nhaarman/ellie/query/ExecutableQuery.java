@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,5 +18,6 @@
 package com.nhaarman.ellie.query;
 
 public interface ExecutableQuery extends Query {
-	void execute();
+
+    void execute();
 }

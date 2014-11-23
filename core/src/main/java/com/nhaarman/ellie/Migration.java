@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +24,23 @@ package com.nhaarman.ellie;
  */
 @com.nhaarman.ellie.internal.Migration
 public abstract class Migration implements Comparable<Migration> {
-	/**
-	 * Returns the database version for which to apply this migration.
-	 *
-	 * @return The database version.
-	 */
-	public abstract int getVersion();
 
-	/**
-	 * Returns the SQL statements which are to be executed in order to perform this migration.
-	 *
-	 * @return The SQL statements.
-	 */
-	public abstract String[] getStatements();
+    /**
+     * Returns the database version for which to apply this migration.
+     *
+     * @return The database version.
+     */
+    public abstract int getVersion();
 
-	@Override
-	public int compareTo(Migration migration) {
-		return Integer.compare(getVersion(), migration.getVersion());
-	}
+    /**
+     * Returns the SQL statements which are to be executed in order to perform this migration.
+     *
+     * @return The SQL statements.
+     */
+    public abstract String[] getStatements();
+
+    @Override
+    public int compareTo(Migration migration) {
+        return Integer.compare(getVersion(), migration.getVersion());
+    }
 }

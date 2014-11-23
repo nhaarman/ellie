@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +31,6 @@ import android.util.Log;
 
 import com.nhaarman.ellie.internal.AdapterHolder;
 import com.nhaarman.ellie.internal.ModelAdapter;
-import com.nhaarman.ellie.internal.ModelRepository;
 import com.nhaarman.ellie.internal.RepositoryHolder;
 
 import java.lang.reflect.Constructor;
@@ -193,7 +193,8 @@ public final class Ellie {
     /**
      * Iterate over a cursor and load entities.
      *
-     * @param cls    The model class.
+     * @param <T>    The Model type
+     * @param cls    The Model class.
      * @param cursor The result cursor.
      *
      * @return The list of entities.
@@ -224,6 +225,7 @@ public final class Ellie {
     /**
      * Iterate over a cursor and load entities. Closes the cursor when finished.
      *
+     * @param <T>    The Model type
      * @param cls    The model class.
      * @param cursor The result cursor.
      *

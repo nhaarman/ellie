@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +19,21 @@ package com.nhaarman.ellie.query;
 
 import com.nhaarman.ellie.Model;
 
-import rx.Observable;
-
 import java.util.List;
 
+import rx.Observable;
+
 public interface ResultQuery extends ExecutableQuery {
-	<T extends Model> List<T> fetch();
 
-	<T extends Model> T fetchSingle();
+    <T extends Model> List<T> fetch();
 
-	<T> T fetchValue(Class<T> type);
+    <T extends Model> T fetchSingle();
 
-	<T extends Model> Observable<List<T>> observable();
+    <T> T fetchValue(Class<T> type);
 
-	<T extends Model> Observable<T> observableSingle();
+    <T extends Model> Observable<List<T>> observable();
 
-	<T> Observable<T> observableValue(Class<T> type);
+    <T extends Model> Observable<T> observableSingle();
+
+    <T> Observable<T> observableValue(Class<T> type);
 }

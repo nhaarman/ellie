@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,82 +17,85 @@
 
 package com.nhaarman.ellie.query;
 
-import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.Ellie;
+import com.nhaarman.ellie.Model;
 
 public final class Update extends QueryBase {
-	private Ellie mEllie;
 
-	public Update(Class<? extends Model> table) {
-		super(null, table);
-		mEllie = Ellie.getInstance();
-	}
+    private Ellie mEllie;
 
-	public Update with(Ellie ellie) {
-		mEllie = ellie;
-		return this;
-	}
+    public Update(final Class<? extends Model> table) {
+        super(null, table);
+        mEllie = Ellie.getInstance();
+    }
 
-	public Set set(String set) {
-		return set(set, (Object[]) null);
-	}
+    public Update with(final Ellie ellie) {
+        mEllie = ellie;
+        return this;
+    }
 
-	public Set set(String set, Object... args) {
-		return new Set(this, mTable, set, args);
-	}
+    public Set set(final String set) {
+        return set(set, (Object[]) null);
+    }
 
-	@Override
-	public String getPartSql() {
-		return "UPDATE " + mEllie.getTableName(mTable);
-	}
+    public Set set(final String set, final Object... args) {
+        return new Set(this, mTable, set, args);
+    }
 
-	public static final class Set extends ExecutableQueryBase {
-		private String mSet;
-		private Object[] mSetArgs;
+    @Override
+    public String getPartSql() {
+        return "UPDATE " + mEllie.getTableName(mTable);
+    }
 
-		private Set(Query parent, Class<? extends Model> table, String set, Object... args) {
-			super(parent, table);
-			mSet = set;
-			mSetArgs = args;
-		}
+    public static final class Set extends ExecutableQueryBase {
 
-		public Where where(String where) {
-			return where(where, (Object[]) null);
-		}
+        private final String mSet;
+        private final Object[] mSetArgs;
 
-		public Where where(String where, Object... args) {
-			return new Where(this, mTable, where, args);
-		}
+        private Set(final Query parent, final Class<? extends Model> table, final String set, final Object... args) {
+            super(parent, table);
+            mSet = set;
+            mSetArgs = args;
+        }
 
-		@Override
-		public String getPartSql() {
-			return "SET " + mSet;
-		}
+        public Where where(final String where) {
+            return where(where, (Object[]) null);
+        }
 
-		@Override
-		public String[] getPartArgs() {
-			return toStringArray(mSetArgs);
-		}
-	}
+        public Where where(final String where, final Object... args) {
+            return new Where(this, mTable, where, args);
+        }
 
-	public static final class Where extends ExecutableQueryBase {
-		private String mWhere;
-		private Object[] mWhereArgs;
+        @Override
+        public String getPartSql() {
+            return "SET " + mSet;
+        }
 
-		private Where(Query parent, Class<? extends Model> table, String where, Object[] args) {
-			super(parent, table);
-			mWhere = where;
-			mWhereArgs = args;
-		}
+        @Override
+        public String[] getPartArgs() {
+            return toStringArray(mSetArgs);
+        }
+    }
 
-		@Override
-		public String getPartSql() {
-			return "WHERE " + mWhere;
-		}
+    public static final class Where extends ExecutableQueryBase {
 
-		@Override
-		public String[] getPartArgs() {
-			return toStringArray(mWhereArgs);
-		}
-	}
+        private final String mWhere;
+        private final Object[] mWhereArgs;
+
+        private Where(final Query parent, final Class<? extends Model> table, final String where, final Object[] args) {
+            super(parent, table);
+            mWhere = where;
+            mWhereArgs = args;
+        }
+
+        @Override
+        public String getPartSql() {
+            return "WHERE " + mWhere;
+        }
+
+        @Override
+        public String[] getPartArgs() {
+            return toStringArray(mWhereArgs);
+        }
+    }
 }

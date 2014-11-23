@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,4 +31,5 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target(TYPE)
 @Retention(CLASS)
 public @interface TypeAdapter {
+
 }

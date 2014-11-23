@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import com.google.common.collect.Sets;
 import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
+import com.nhaarman.ellie.ModelRepository;
 import com.nhaarman.ellie.annotation.Table;
-import com.nhaarman.ellie.internal.ModelRepository;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
 import com.nhaarman.ellie.query.Select;
@@ -44,7 +45,7 @@ import javax.lang.model.element.TypeElement;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.STATIC;
 
-public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
+@SuppressWarnings("HardCodedStringLiteral") public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
 
     private static final Map<String, String> CURSOR_METHOD_MAP = new HashMap<String, String>() {
         {
@@ -112,7 +113,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writeGetEntity(javaWriter, modelSimpleName);
         writeRemoveEntity(javaWriter, modelSimpleName);
         writeGetOrFindEntity(javaWriter, modelSimpleName);
-        writeCreateContentValues(javaWriter,modelQualifiedName, columns);
+        writeCreateContentValues(javaWriter, modelQualifiedName, columns);
         writeGetEntityIdentifier(javaWriter, modelSimpleName);
 
         javaWriter.endType();
@@ -227,7 +228,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
                      .append(".class).getOrFindEntity(");
             } else if (column.requiresTypeAdapter()) {
                 closeParens++;
-                value.append("Ellie.getInstance().getTypeAdapter(")
+                value.append("mEllie.getTypeAdapter(")
                      .append(column.getDeserializedSimpleName())
                      .append(".class).deserialize(");
             }
@@ -337,14 +338,15 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writer.beginMethod(ContentValues.class.getSimpleName(), "createContentValues", PUBLIC, "final " + modelQualifiedName, "entity");
         writer.emitStatement("ContentValues values = new ContentValues()");
 
+        final StringBuilder value = new StringBuilder();
         for (ColumnElement column : columns) {
-            final StringBuilder value = new StringBuilder();
+            value.setLength(0);
             int closeParens = 0;
 
             if (!column.isModel() && column.requiresTypeAdapter()) {
                 closeParens++;
                 value.append("(").append(column.getSerializedSimpleName())
-                     .append(") Ellie.getInstance().getTypeAdapter(")
+                     .append(") mEllie.getTypeAdapter(")
                      .append(column.getDeserializedSimpleName())
                      .append(".class).serialize(");
             }
@@ -352,7 +354,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
             if (column.getGetter() == null) {
                 value.append("entity.").append(column.getFieldName());
             } else {
-                value.append("entity.").append(column.getGetter().toString());
+                value.append("entity.").append(column.getGetter());
             }
 
             if (column.isModel()) {
@@ -361,7 +363,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
                 if (column.getGetter() == null) {
                     value.append(column.getFieldName());
                 } else {
-                    value.append(column.getGetter().toString());
+                    value.append(column.getGetter());
                 }
                 value.append(".getId()");
                 value.append(" : null");
@@ -371,7 +373,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
                 value.append(")");
             }
 
-            writer.emitStatement("values.put(\"" + column.getColumnName() + "\", " + value.toString() + ")");
+            writer.emitStatement("values.put(\"" + column.getColumnName() + "\", " + value + ")");
         }
 
         writer.emitStatement("return values");

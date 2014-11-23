@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,42 +38,43 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target(FIELD)
 @Retention(CLASS)
 public @interface Collate {
-	/**
-	 * When SQLite compares two strings, it uses a collating sequence or collating function (two words for the same
-	 * thing) to determine which string is greater or if the two strings are equal. SQLite has three built-in
-	 * collating functions: BINARY, NOCASE, and RTRIM.
-	 */
-	public enum CollatingSequence {
-		/**
-		 * Compares string data using memcmp(), regardless of text encoding.
-		 */
-		BINARY("BINARY"),
-		/**
-		 * The same as binary, except the 26 upper case characters of ASCII are folded to their lower case equivalents
-		 * before the comparison is performed. Note that only ASCII characters are case folded. SQLite does not
-		 * attempt to do full UTF case folding due to the size of the tables required.
-		 */
-		NOCASE("NOCASE"),
-		/**
-		 * The same as binary, except that trailing space characters are ignored.
-		 */
-		RTRIM("RTRIM");
 
-		private String mKeyword;
+    /**
+     * When SQLite compares two strings, it uses a collating sequence or collating function (two words for the same
+     * thing) to determine which string is greater or if the two strings are equal. SQLite has three built-in
+     * collating functions: BINARY, NOCASE, and RTRIM.
+     */
+    public enum CollatingSequence {
+        /**
+         * Compares string data using memcmp(), regardless of text encoding.
+         */
+        BINARY("BINARY"),
+        /**
+         * The same as binary, except the 26 upper case characters of ASCII are folded to their lower case equivalents
+         * before the comparison is performed. Note that only ASCII characters are case folded. SQLite does not
+         * attempt to do full UTF case folding due to the size of the tables required.
+         */
+        NOCASE("NOCASE"),
+        /**
+         * The same as binary, except that trailing space characters are ignored.
+         */
+        RTRIM("RTRIM");
 
-		CollatingSequence(String keyword) {
-			mKeyword = keyword;
-		}
+        private String mKeyword;
 
-		public String keyword() {
-			return mKeyword;
-		}
-	}
+        CollatingSequence(String keyword) {
+            mKeyword = keyword;
+        }
 
-	/**
-	 * Returns a collating sequence to use for string comparison.
-	 *
-	 * @return The collating sequence.
-	 */
-	public CollatingSequence value();
+        public String keyword() {
+            return mKeyword;
+        }
+    }
+
+    /**
+     * Returns a collating sequence to use for string comparison.
+     *
+     * @return The collating sequence.
+     */
+    public CollatingSequence value();
 }

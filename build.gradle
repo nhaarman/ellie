@@ -11,3 +11,9 @@ subprojects {
 	project.group = GROUP
 	project.version = VERSION_NAME
 }
+
+allprojects {
+	tasks.withType(Javadoc) {
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
+}

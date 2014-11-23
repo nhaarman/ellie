@@ -15,24 +15,40 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal;
+package com.nhaarman.ellie;
 
-import com.nhaarman.ellie.Model;
-import com.nhaarman.ellie.ModelRepository;
-
-import java.util.List;
+import android.database.Cursor;
 
 /**
- * Used internally to create and store ModelRepository instances.
+ * An interface to perform database operations for a Model.
+ *
+ * @param <T> The Model instance to perform database operations for.
  */
-public interface RepositoryHolder {
+public interface ModelRepository<T extends Model> {
 
-    String IMPL_CLASS_PACKAGE = "com.nhaarman.ellie";
-    String IMPL_CLASS_NAME = "RepositoryHolderImpl";
-    String IMPL_CLASS_FQCN = IMPL_CLASS_PACKAGE + "." + IMPL_CLASS_NAME;
+    /* Direct database manipulation */
 
-    <T extends Model> ModelRepository<T> getModelRepository(Class<? extends Model> cls);
+    void load(T entity, Cursor cursor);
 
-    List<? extends ModelRepository> getModelRepositories();
+    /* Model operations */
 
+    T find(long id);
+
+    Long create(T entity);
+
+    Long update(T entity);
+
+    Long createOrUpdate(T entity);
+
+    void delete(T entity);
+
+    /* Cache operations */
+
+    void putEntity(T entity);
+
+    T getEntity(long id);
+
+    void removeEntity(T entity);
+
+    T getOrFindEntity(long id);
 }

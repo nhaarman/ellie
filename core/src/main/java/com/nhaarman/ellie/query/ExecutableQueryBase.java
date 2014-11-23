@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +21,13 @@ import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.util.QueryUtils;
 
 public abstract class ExecutableQueryBase extends QueryBase implements ExecutableQuery {
-	public ExecutableQueryBase(Query parent, Class<? extends Model> table) {
-		super(parent, table);
-	}
 
-	@Override
-	public void execute() {
-		QueryUtils.execSQL(getSql(), getArgs());
-	}
+    protected ExecutableQueryBase(final Query parent, final Class<? extends Model> table) {
+        super(parent, table);
+    }
+
+    @Override
+    public void execute() {
+        QueryUtils.execSQL(getSql(), getArgs());
+    }
 }

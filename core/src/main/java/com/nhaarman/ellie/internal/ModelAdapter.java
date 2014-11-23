@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Michael Pardo
+ * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +20,14 @@ package com.nhaarman.ellie.internal;
 import com.nhaarman.ellie.Model;
 
 /**
- * Used internally to perform database operations on a model.
+ * Used internally for model definitions.
  */
 public interface ModelAdapter<T extends Model> {
 
-	Class<T> getModelType();
+    Class<T> getModelType();
 
-	String getTableName();
+    String getTableName();
 
-	String getSchema();
+    String getSchema();
 
 }
