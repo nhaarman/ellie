@@ -40,7 +40,7 @@ public abstract class Migration implements Comparable<Migration> {
     public abstract String[] getStatements();
 
     @Override
-    public int compareTo(Migration migration) {
+    public int compareTo(final Migration migration) {
         return Integer.compare(getVersion(), migration.getVersion());
     }
 }

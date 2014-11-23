@@ -38,7 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Ellie {
+@SuppressWarnings("rawtypes") public final class Ellie {
 
     public static final int DEFAULT_CACHE_SIZE = 1024;
 
@@ -67,8 +67,6 @@ public final class Ellie {
             return ordinal() >= logLevel.ordinal();
         }
     }
-
-    private Context mContext;
 
     private AdapterHolder mAdapterHolder;
 
@@ -150,37 +148,28 @@ public final class Ellie {
             return;
         }
 
-        mContext = context.getApplicationContext();
         mLogLevel = logLevel;
 
         try {
-            Class adapterHolderClass = Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
-            mAdapterHolder = (AdapterHolder) adapterHolderClass.newInstance();
-        } catch (Exception e) {
-            if (mLogLevel.log(LogLevel.BASIC)) {
-                Log.e(TAG, "Failed to initialize.", e);
-            }
-            throw new RuntimeException(e);
+            Class<? extends AdapterHolder> adapterHolderClass = (Class<? extends AdapterHolder>) Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
+            Constructor<? extends AdapterHolder> constructor = adapterHolderClass.getConstructor();
+            mAdapterHolder = constructor.newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalStateException(e);
         }
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(mContext, name, version);
+        DatabaseHelper databaseHelper = new DatabaseHelper(context.getApplicationContext(), name, version);
         mSQLiteDatabase = databaseHelper.getWritableDatabase();
 
         try {
-            Class adapterHolderClass = Class.forName(RepositoryHolder.IMPL_CLASS_FQCN);
-            mRepositoryHolder = (RepositoryHolder) adapterHolderClass.getConstructor(Ellie.class, SQLiteDatabase.class, int.class).newInstance(this, mSQLiteDatabase, cacheSize);
-        } catch (Exception e) {
-            if (mLogLevel.log(LogLevel.BASIC)) {
-                Log.e(TAG, "Failed to initialize.", e);
-            }
-            throw new RuntimeException(e);
+            Class<? extends RepositoryHolder> adapterHolderClass = (Class<? extends RepositoryHolder>) Class.forName(RepositoryHolder.IMPL_CLASS_FQCN);
+            Constructor<? extends RepositoryHolder> constructor = adapterHolderClass.getConstructor(Ellie.class, SQLiteDatabase.class, int.class);
+            mRepositoryHolder = constructor.newInstance(this, mSQLiteDatabase, cacheSize);
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalStateException(e);
         }
 
         mInitialized = true;
-    }
-
-    public Context getContext() {
-        return mContext;
     }
 
     public SQLiteDatabase getDatabase() {
@@ -203,7 +192,7 @@ public final class Ellie {
      * @return The list of entities.
      */
     public <T extends Model> List<T> processCursor(final Class<T> cls, final Cursor cursor) {
-        final List<T> entities = new ArrayList<T>();
+        final List<T> entities = new ArrayList<>();
         try {
             Constructor<T> entityConstructor = cls.getConstructor();
             if (cursor.moveToFirst()) {
@@ -256,7 +245,7 @@ public final class Ellie {
 
     // Private classes
 
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") private class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(final Context context, final String name, final int version) {
             super(context, name, mLogLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);
@@ -288,7 +277,7 @@ public final class Ellie {
         }
 
         private void executeCreate(final SQLiteDatabase db) {
-            final List<String> tableDefinitions = new ArrayList<String>();
+            final List<String> tableDefinitions = new ArrayList<>();
             for (ModelAdapter<?> modelAdapter : mAdapterHolder.getModelAdapters()) {
                 tableDefinitions.add(modelAdapter.getSchema());
             }
@@ -332,7 +321,7 @@ public final class Ellie {
         @Override
         public Cursor newCursor(final SQLiteDatabase sqLiteDatabase, final SQLiteCursorDriver sqLiteCursorDriver, final String editTable, final SQLiteQuery sqLiteQuery) {
             Log.v(TAG, sqLiteQuery.toString());
-            return new SQLiteCursor(sqLiteDatabase, sqLiteCursorDriver, editTable, sqLiteQuery);
+            return new SQLiteCursor(sqLiteCursorDriver, editTable, sqLiteQuery);
         }
     }
 }
