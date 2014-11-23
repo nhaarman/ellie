@@ -26,15 +26,15 @@ import com.nhaarman.ellie.query.Select.Join.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"HardCodedStringLiteral", "PublicInnerClass"})
 public final class Select extends QueryBase {
 
-    private String[] mColumns;
+    private final String[] mColumns;
 
     private Ellie mEllie;
 
     public Select() {
-        super(null, null);
-        mEllie = Ellie.getInstance();
+        this(new String[]{});
     }
 
     public Select(final String... columns) {
@@ -65,7 +65,8 @@ public final class Select extends QueryBase {
         return builder.toString();
     }
 
-    private Ellie getEllie() {
+    @Override
+    public Ellie getEllie() {
         return mEllie;
     }
 
@@ -147,7 +148,7 @@ public final class Select extends QueryBase {
         public String getPartSql() {
             StringBuilder builder = new StringBuilder();
             builder.append("FROM ");
-            builder.append(((Select) mParent).getEllie().getTableName(mTable)).append(" ");
+            builder.append(mParent.getEllie().getTableName(mTable)).append(" ");
 
             for (Join join : mJoins) {
                 builder.append(join.getPartSql()).append(" ");
@@ -156,8 +157,9 @@ public final class Select extends QueryBase {
             return builder.toString();
         }
 
-        private Ellie getEllie() {
-            return ((Select) mParent).getEllie();
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 
@@ -207,7 +209,12 @@ public final class Select extends QueryBase {
 
         @Override
         public String getPartSql() {
-            return mType.getKeyword() + " " + ((From) mParent).getEllie().getTableName(mTable) + " " + mConstraint;
+            return mType.getKeyword() + " " + mParent.getEllie().getTableName(mTable) + " " + mConstraint;
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 
@@ -243,6 +250,11 @@ public final class Select extends QueryBase {
         public String[] getPartArgs() {
             return toStringArray(mWhereArgs);
         }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
+        }
     }
 
     public static final class GroupBy extends ResultQueryBase {
@@ -270,6 +282,11 @@ public final class Select extends QueryBase {
         public String getPartSql() {
             return "GROUP BY " + mGroupBy;
         }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
+        }
     }
 
     public static final class Having extends ResultQueryBase {
@@ -293,6 +310,11 @@ public final class Select extends QueryBase {
         public String getPartSql() {
             return "HAVING " + mHaving;
         }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
+        }
     }
 
     public static final class OrderBy extends ResultQueryBase {
@@ -311,6 +333,11 @@ public final class Select extends QueryBase {
         @Override
         public String getPartSql() {
             return "ORDER BY " + mOrderBy;
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
 
     }
@@ -332,6 +359,11 @@ public final class Select extends QueryBase {
         public String getPartSql() {
             return "LIMIT " + mLimit;
         }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
+        }
     }
 
     public static final class Offset extends ResultQueryBase {
@@ -346,6 +378,11 @@ public final class Select extends QueryBase {
         @Override
         protected String getPartSql() {
             return "OFFSET " + mOffset;
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 }

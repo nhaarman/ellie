@@ -222,7 +222,7 @@ public class EllieTest {
                     "Testing INSERT body."
             ).execute();
             assert false;
-        } catch (MalformedQueryException ignored) {
+        } catch (MalformedQueryException e) {
             // Successfully threw exception
             assert true;
         }

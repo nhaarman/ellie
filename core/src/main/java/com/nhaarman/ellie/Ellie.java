@@ -44,7 +44,7 @@ public final class Ellie {
 
     private static final String TAG = "Ellie";
 
-    private static Ellie sInstance;
+    private static Ellie sInstance = new Ellie();
 
     /**
      * Controls the level of logging.
@@ -80,9 +80,6 @@ public final class Ellie {
 
     private boolean mInitialized;
 
-    public Ellie() {
-    }
-
     public static Ellie getInstance() {
         synchronized (Ellie.class) {
             if (sInstance == null) {
@@ -90,6 +87,12 @@ public final class Ellie {
             }
 
             return sInstance;
+        }
+    }
+
+    public static void useInstance(final Ellie ellie) {
+        synchronized (Ellie.class) {
+            sInstance = ellie;
         }
     }
 

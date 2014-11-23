@@ -20,6 +20,7 @@ package com.nhaarman.ellie.query;
 import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
 
+@SuppressWarnings({"HardCodedStringLiteral", "PublicInnerClass"})
 public final class Delete extends QueryBase {
 
     private Ellie mEllie;
@@ -43,7 +44,8 @@ public final class Delete extends QueryBase {
         return "DELETE";
     }
 
-    private Ellie getEllie() {
+    @Override
+    public Ellie getEllie() {
         return mEllie;
     }
 
@@ -63,7 +65,12 @@ public final class Delete extends QueryBase {
 
         @Override
         public String getPartSql() {
-            return "FROM " + ((Delete) mParent).getEllie().getTableName(mTable);
+            return "FROM " + mParent.getEllie().getTableName(mTable);
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 
@@ -86,6 +93,11 @@ public final class Delete extends QueryBase {
         @Override
         public String[] getPartArgs() {
             return toStringArray(mWhereArgs);
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 }

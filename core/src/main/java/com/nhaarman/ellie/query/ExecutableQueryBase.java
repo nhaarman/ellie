@@ -18,7 +18,6 @@
 package com.nhaarman.ellie.query;
 
 import com.nhaarman.ellie.Model;
-import com.nhaarman.ellie.util.QueryUtils;
 
 public abstract class ExecutableQueryBase extends QueryBase implements ExecutableQuery {
 
@@ -28,6 +27,6 @@ public abstract class ExecutableQueryBase extends QueryBase implements Executabl
 
     @Override
     public void execute() {
-        QueryUtils.execSQL(getSql(), getArgs());
+        getEllie().getDatabase().execSQL(getSql(), getArgs());
     }
 }

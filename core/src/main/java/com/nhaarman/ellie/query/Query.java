@@ -17,10 +17,14 @@
 
 package com.nhaarman.ellie.query;
 
+import com.nhaarman.ellie.Ellie;
+
 public interface Query {
 
     String getSql();
 
     String[] getArgs();
+
+    Ellie getEllie();
 
 }

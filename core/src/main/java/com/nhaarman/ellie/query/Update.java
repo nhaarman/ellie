@@ -20,6 +20,7 @@ package com.nhaarman.ellie.query;
 import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
 
+@SuppressWarnings({"HardCodedStringLiteral", "PublicInnerClass"})
 public final class Update extends QueryBase {
 
     private Ellie mEllie;
@@ -45,6 +46,11 @@ public final class Update extends QueryBase {
     @Override
     public String getPartSql() {
         return "UPDATE " + mEllie.getTableName(mTable);
+    }
+
+    @Override
+    public Ellie getEllie() {
+        return mEllie;
     }
 
     public static final class Set extends ExecutableQueryBase {
@@ -75,6 +81,11 @@ public final class Update extends QueryBase {
         public String[] getPartArgs() {
             return toStringArray(mSetArgs);
         }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
+        }
     }
 
     public static final class Where extends ExecutableQueryBase {
@@ -96,6 +107,11 @@ public final class Update extends QueryBase {
         @Override
         public String[] getPartArgs() {
             return toStringArray(mWhereArgs);
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 }

@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
 
+@SuppressWarnings({"HardCodedStringLiteral", "PublicInnerClass"})
 public final class Insert extends QueryBase {
 
     private Ellie mEllie;
@@ -49,7 +50,8 @@ public final class Insert extends QueryBase {
         return "INSERT";
     }
 
-    private Ellie getEllie() {
+    @Override
+    public Ellie getEllie() {
         return mEllie;
     }
 
@@ -76,6 +78,11 @@ public final class Insert extends QueryBase {
             }
 
             return builder.toString();
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 
@@ -113,6 +120,11 @@ public final class Insert extends QueryBase {
         @Override
         protected String[] getPartArgs() {
             return toStringArray(mValuesArgs);
+        }
+
+        @Override
+        public Ellie getEllie() {
+            return mParent.getEllie();
         }
     }
 }
