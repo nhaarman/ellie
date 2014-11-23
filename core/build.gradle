@@ -1,7 +1,7 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: AndroidStubPlugin
 apply plugin: 'java'
-apply from: '../gradle-mvn-push.gradle'
+apply from: '../gradle/scripts/uploadArchives.gradle'
 
 def Properties props = new Properties()
 props.load(new FileInputStream(file('../local.properties')))

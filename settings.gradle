@@ -1,2 +1,1 @@
 include ':core', ':compiler'
-include ':test'

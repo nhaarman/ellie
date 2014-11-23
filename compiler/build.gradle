@@ -1,6 +1,6 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'java'
-apply from: '../gradle-mvn-push.gradle'
+apply from: '../gradle/scripts/uploadArchives.gradle'
 
 repositories {
 	mavenCentral()

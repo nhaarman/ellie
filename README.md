@@ -5,14 +5,34 @@ Compile-time active record ORM for Android.
 
 Ellie is a heavily modified fork from [Ollie](https://github.com/pardom/ollie), with a few important modifications:
 
- -
- -
- -
+ - Calls to the main `Ellie` class are not static;
+ - Moved database logic out of Model classes into ModelRepository classes;
 
 Download
 --------
 
-Ellie is not yet available on a central repository.
+Grab via Maven:
+
+```xml
+<dependency>
+  <groupId>com.nhaarman.ellie</groupId>
+  <artifactId>core</artifactId>
+  <version>0.0.1</version>
+</dependency>
+<dependency>
+  <groupId>com.nhaarman.ellie</groupId>
+  <artifactId>compiler</artifactId>
+  <version>0.0.1</version>
+  <optional>true</optional>
+</dependency>
+```
+
+or Gradle:
+
+```groovy
+compile 'com.nhaarman.ellie:core:0.0.1'
+provided 'com.nhaarman.ellie:compiler:0.0.1'
+```
 
 Build
 -----
@@ -34,7 +54,8 @@ org.gradle.daemon=true
 org.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
 ```
 
-Next, in IntelliJ, add a Remote Run Configuration and start debugging. When building the project, the debugger will halt at breakpoints in the annotation processor.
+Next, in IntelliJ, add a Remote Run Configuration and start debugging. When building the project (`gradlew build`), the debugger will halt at breakpoints in the annotation
+processor.
 
 License
 =======
