@@ -16,9 +16,10 @@
 
 package com.nhaarman.ellie;
 
-import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.NotNull;
+import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
 
 import java.util.Date;
@@ -31,12 +32,42 @@ public class Note extends Model {
     public static final String DATE = "date";
 
     @Column(TITLE)
-    public String title;
+    private String title;
 
     @Column(BODY)
     @NotNull
-    public String body;
+    private String body;
 
     @Column(DATE)
-    public Date date;
+    private Date date;
+
+    @GetterFor(TITLE)
+    public String getTitle() {
+        return title;
+    }
+
+    @SetterFor(TITLE)
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    @GetterFor(BODY)
+    public String getBody() {
+        return body;
+    }
+
+    @SetterFor(BODY)
+    public void setBody(final String body) {
+        this.body = body;
+    }
+
+    @GetterFor(DATE)
+    public Date getDate() {
+        return date;
+    }
+
+    @SetterFor(DATE)
+    public void setDate(final Date date) {
+        this.date = date;
+    }
 }

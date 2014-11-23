@@ -113,33 +113,33 @@ public class EllieTest {
     @Test
     public void testSaveEntity() {
         Note note = new Note();
-        assertThat(note.id).isNull();
+        assertThat(note.getId()).isNull();
 
         note.title = "Test note";
         note.body = "Testing saving a note.";
         note.save();
-        assertThat(note.id).isNotNull();
-        assertThat(note.id).isGreaterThan(0l);
+        assertThat(note.getId()).isNotNull();
+        assertThat(note.getId()).isGreaterThan(0l);
     }
 
     @Test
     public void testLoadEntity() {
         Note note = new Select().from(Note.class).where(Model.COLUMN_ID + "=?", 1L).fetchSingle();
         assertThat(note).isNotNull();
-        assertThat(note.id).isNotNull();
-        assertThat(note.id).isGreaterThan(0l);
+        assertThat(note.getId()).isNotNull();
+        assertThat(note.getId()).isGreaterThan(0l);
     }
 
     @Test
     public void testDeleteEntity() {
         Note note = new Select().from(Note.class).where(Model.COLUMN_ID + "=?", 1L).fetchSingle();
         assertThat(note).isNotNull();
-        assertThat(note.id).isNotNull();
-        assertThat(note.id).isGreaterThan(0l);
+        assertThat(note.getId()).isNotNull();
+        assertThat(note.getId()).isGreaterThan(0l);
 
         note.delete();
         assertThat(note).isNotNull();
-        assertThat(note.id).isNull();
+        assertThat(note.getId()).isNull();
     }
 
     @Test
@@ -172,12 +172,12 @@ public class EllieTest {
         assertThat(query.getSql()).isEqualTo(sql);
         assertThat(query.getArgs()).isEqualTo(null);
 
-        sql = "SELECT * FROM notes INNER JOIN noteTags ON notes.id=noteTags.note INNER JOIN tags ON tag.id=noteTags" +
+        sql = "SELECT * FROM notes INNER JOIN noteTags ON notes.getId()=noteTags.note INNER JOIN tags ON tag.getId()=noteTags" +
                 ".tag WHERE tag.name=? ORDER BY notes.title ASC LIMIT 10 OFFSET 10";
         query = new Select()
                 .from(Note.class)
-                .innerJoin(NoteTag.class).on("notes.id=noteTags.note")
-                .innerJoin(Tag.class).on("tag.id=noteTags.tag")
+                .innerJoin(NoteTag.class).on("notes.getId()=noteTags.note")
+                .innerJoin(Tag.class).on("tag.getId()=noteTags.tag")
                 .where("tag.name=?", "test")
                 .orderBy("notes.title ASC")
                 .limit("10")
@@ -279,8 +279,8 @@ public class EllieTest {
         // Single note
         Note note = new Select().from(Note.class).fetchSingle();
         assertThat(note).isNotNull();
-        assertThat(note.id).isNotNull();
-        assertThat(note.id).isGreaterThan(0l);
+        assertThat(note.getId()).isNotNull();
+        assertThat(note.getId()).isGreaterThan(0l);
 
         // Single note async
         new Select().from(Note.class).observableSingle()
@@ -290,8 +290,8 @@ public class EllieTest {
                                 public void call(Model note) {
                                     System.out.println("2");
                                     assertThat(note).isNotNull();
-                                    assertThat(note.id).isNotNull();
-                                    assertThat(note.id).isGreaterThan(0l);
+                                    assertThat(note.getId()).isNotNull();
+                                    assertThat(note.getId()).isGreaterThan(0l);
                                 }
                             }
                     );
@@ -300,14 +300,14 @@ public class EllieTest {
         // Single note by id
         note = new Select().from(Note.class).where(Note.COLUMN_ID + "=?", 1).fetchSingle();
         assertThat(note).isNotNull();
-        assertThat(note.id).isNotNull();
-        assertThat(note.id).isGreaterThan(0l);
+        assertThat(note.getId()).isNotNull();
+        assertThat(note.getId()).isGreaterThan(0l);
 
         // Single tag
         Tag tag = new Select().from(Tag.class).fetchSingle();
         assertThat(tag).isNotNull();
-        assertThat(tag.id).isNotNull();
-        assertThat(tag.id).isGreaterThan(0l);
+        assertThat(tag.getId()).isNotNull();
+        assertThat(tag.getId()).isGreaterThan(0l);
 
         // Save note tag to get guaranteed join result
         NoteTag noteTag = new NoteTag();
@@ -325,7 +325,7 @@ public class EllieTest {
                 .from(Note.class)
                 .innerJoin(NoteTag.class).on("notes._id=noteTags.note")
                 .innerJoin(Tag.class).on("tags._id=noteTags.tag")
-                .where("tags._id=?", tag.id.toString())
+                .where("tags._id=?", tag.getId().toString())
                 .fetch();
         assertThat(notes).isNotNull();
         assertThat(notes.size()).isGreaterThan(0);
@@ -344,7 +344,7 @@ public class EllieTest {
     public void testSaveNoteTagWithoutTag() {
         NoteTag noteTag = new NoteTag();
         noteTag.save();
-        assertThat(noteTag.id).isGreaterThan(0l);
+        assertThat(noteTag.getId()).isGreaterThan(0l);
     }
 
     @Test
@@ -352,9 +352,9 @@ public class EllieTest {
         Note note = new Note();
         note.body = "this is draft";
         note.save();
-        new Delete().from(Note.class).where(Note.COLUMN_ID + "=?", note.id.toString()).execute();
+        new Delete().from(Note.class).where(Note.COLUMN_ID + "=?", note.getId().toString()).execute();
 
         // TODO: This seems like a bit of work
-        // assertThat(note.id).isNull();
+        // assertThat(note.getId()).isNull();
     }
 }

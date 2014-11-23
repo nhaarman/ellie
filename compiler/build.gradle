@@ -2,9 +2,6 @@ apply plugin: 'android-sdk-manager'
 apply plugin: 'java'
 apply from: '../gradle-mvn-push.gradle'
 
-targetCompatibility = '1.7'
-sourceCompatibility = '1.7'
-
 repositories {
 	mavenCentral()
 }

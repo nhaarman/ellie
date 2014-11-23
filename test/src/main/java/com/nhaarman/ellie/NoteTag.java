@@ -16,9 +16,10 @@
 
 package com.nhaarman.ellie;
 
-import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.annotation.Column;
 import com.nhaarman.ellie.annotation.ForeignKey;
+import com.nhaarman.ellie.annotation.GetterFor;
+import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
 
 import static com.nhaarman.ellie.annotation.ForeignKey.ReferentialAction.CASCADE;
@@ -31,9 +32,29 @@ public class NoteTag extends Model {
 
     @Column(NOTE)
     @ForeignKey(onDelete = CASCADE)
-    public Note note;
+    private Note note;
 
     @Column(TAG)
     @ForeignKey(onDelete = CASCADE)
-    public Tag tag;
+    private Tag tag;
+
+    @GetterFor(NOTE)
+    public Note getNote() {
+        return note;
+    }
+
+    @SetterFor(NOTE)
+    public void setNote(final Note note) {
+        this.note = note;
+    }
+
+    @GetterFor(TAG)
+    public Tag getTag() {
+        return tag;
+    }
+
+    @SetterFor(TAG)
+    public void setTag(final Tag tag) {
+        this.tag = tag;
+    }
 }

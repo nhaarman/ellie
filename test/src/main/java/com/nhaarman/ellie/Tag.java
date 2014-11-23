@@ -17,17 +17,28 @@
 package com.nhaarman.ellie;
 
 
-import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.NotNull;
+import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
 
 @Table("tags")
 public class Tag extends Model {
 
-    public static final String Name = "name";
+    public static final String NAME = "name";
 
-    @Column(Name)
+    @Column(NAME)
     @NotNull
-    public String name;
+    private String mName;
+
+    @GetterFor(NAME)
+    public String getName() {
+        return mName;
+    }
+
+    @SetterFor(NAME)
+    public void setName(final String name) {
+        this.mName = name;
+    }
 }

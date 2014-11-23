@@ -34,7 +34,7 @@ public class ModelAdapterTest {
     @Test
     public void modelAdapter() {
         JavaFileObject source = JavaFileObjects.forSourceString(
-                "com.nhaarman.ellie.test.NOTE",
+                "com.nhaarman.ellie.test.Note",
                 Joiner.on('\n').join(
                         "package com.nhaarman.ellie.test;",
                         "import java.util.Date;",
@@ -43,7 +43,7 @@ public class ModelAdapterTest {
                         "import com.nhaarman.ellie.annotation.NotNull;",
                         "import com.nhaarman.ellie.annotation.Table;",
                         "@Table(\"notes\")",
-                        "public class NOTE extends Model {",
+                        "public class Note extends Model {",
                         "	public static final String TITLE = \"title\";",
                         "	public static final String BODY = \"body\";",
                         "	public static final String DATE = \"date\";",
@@ -55,15 +55,15 @@ public class ModelAdapterTest {
         );
 
         JavaFileObject expectedSource = JavaFileObjects.forSourceString(
-                "com.nhaarman.ellie/NOTE$$ModelAdapter",
+                "com.nhaarman.ellie/Note$$ModelAdapter",
                 Joiner.on('\n').join(
                         "package com.nhaarman.ellie;",
                         "import com.nhaarman.ellie.internal.ModelAdapter;",
-                        "import com.nhaarman.ellie.test.NOTE;",
-                        "public final class NOTE$$ModelAdapter implements ModelAdapter<NOTE> {",
+                        "import com.nhaarman.ellie.test.Note;",
+                        "public final class Note$$ModelAdapter implements ModelAdapter<Note> {",
                         "   @Override",
-                        "	public Class<NOTE> getModelType() {",
-                        "		return NOTE.class;",
+                        "	public Class<Note> getModelType() {",
+                        "		return Note.class;",
                         "	}",
                         "   @Override",
                         "	public String getTableName() {",
@@ -92,7 +92,7 @@ public class ModelAdapterTest {
     @Test
     public void tablesAreClasses() {
         JavaFileObject source = JavaFileObjects.forSourceString(
-                "com.nhaarman.ellie.test.NOTE",
+                "com.nhaarman.ellie.test.Note",
                 Joiner.on('\n').join(
                         "package com.nhaarman.ellie.test;",
                         "import java.util.Date;",
@@ -101,7 +101,7 @@ public class ModelAdapterTest {
                         "import com.nhaarman.ellie.annotation.NotNull;",
                         "import com.nhaarman.ellie.annotation.Table;",
                         "@Table(\"notes\")",
-                        "public class NOTE extends Model {",
+                        "public class Note extends Model {",
                         "	public static final String TITLE = \"title\";",
                         "	public static final String BODY = \"body\";",
                         "	public static final String DATE = \"date\";",
@@ -120,7 +120,7 @@ public class ModelAdapterTest {
     @Test
     public void columnsAreFields() {
         JavaFileObject source = JavaFileObjects.forSourceString(
-                "com.nhaarman.ellie.test.NOTE",
+                "com.nhaarman.ellie.test.Note",
                 Joiner.on('\n').join(
                         "package com.nhaarman.ellie.test;",
                         "import java.util.Date;",
@@ -129,7 +129,7 @@ public class ModelAdapterTest {
                         "import com.nhaarman.ellie.annotation.NotNull;",
                         "import com.nhaarman.ellie.annotation.Table;",
                         "@Column(\"notes\")",
-                        "public class NOTE extends Model {",
+                        "public class Note extends Model {",
                         "	public static final String TITLE = \"title\";",
                         "	public static final String BODY = \"body\";",
                         "	public static final String DATE = \"date\";",
@@ -149,7 +149,7 @@ public class ModelAdapterTest {
     @Test
     public void columnsAreUnique() {
         JavaFileObject source = JavaFileObjects.forSourceString(
-                "com.nhaarman.ellie.test.NOTE",
+                "com.nhaarman.ellie.test.Note",
                 Joiner.on('\n').join(
                         "package com.nhaarman.ellie.test;",
                         "import java.util.Date;",
@@ -158,7 +158,7 @@ public class ModelAdapterTest {
                         "import com.nhaarman.ellie.annotation.NotNull;",
                         "import com.nhaarman.ellie.annotation.Table;",
                         "@Table(\"notes\")",
-                        "public class NOTE extends Model {",
+                        "public class Note extends Model {",
                         "	public static final String TITLE = \"title\";",
                         "	public static final String DATE = \"date\";",
                         "	@Column(TITLE) public String title;",

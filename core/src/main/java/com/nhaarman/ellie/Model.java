@@ -21,6 +21,7 @@ import android.provider.BaseColumns;
 
 import com.nhaarman.ellie.annotation.AutoIncrement;
 import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.PrimaryKey;
 import com.nhaarman.ellie.internal.ModelRepository;
 
@@ -38,7 +39,7 @@ public abstract class Model {
     @Column(COLUMN_ID)
     @PrimaryKey
     @AutoIncrement
-    public Long id;
+    protected Long mId;
 
     protected Model() {
         mRepository = Ellie.getInstance().getModelRepository(getClass());
@@ -46,6 +47,15 @@ public abstract class Model {
 
     protected Model(final ModelRepository<? extends Model> repository) {
         mRepository = repository;
+    }
+
+    @GetterFor(COLUMN_ID)
+    public Long getId() {
+        return mId;
+    }
+
+    public void setId(final Long id) {
+        this.mId = id;
     }
 
     /**
@@ -69,14 +79,14 @@ public abstract class Model {
      * @return The record id.
      */
     public final Long save() {
-        if (id == null) {
-            id = mRepository.create(this);
+        if (mId == null) {
+            mId = mRepository.create(this);
         } else {
             mRepository.update(this);
         }
         mRepository.putEntity(this);
         notifyChange();
-        return id;
+        return mId;
     }
 
     /**
@@ -88,7 +98,7 @@ public abstract class Model {
         mRepository.delete(this);
         mRepository.removeEntity(this);
         notifyChange();
-        id = null;
+        mId = null;
     }
 
     /**
@@ -104,9 +114,9 @@ public abstract class Model {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof Model && id != null) {
+        if (obj instanceof Model && mId != null) {
             final Model other = (Model) obj;
-            return getClass().equals(other.getClass()) && id.equals(other.id);
+            return getClass().equals(other.getClass()) && mId.equals(other.getId());
         }
         return this == obj;
     }
@@ -115,7 +125,7 @@ public abstract class Model {
     public int hashCode() {
         int hash = 1;
         hash = hash * 17 + getClass().getName().hashCode();
-        hash = hash * 31 + (id != null ? id.intValue() : super.hashCode());
+        hash = hash * 31 + (mId != null ? mId.intValue() : super.hashCode());
         return hash;
     }
 }

@@ -193,8 +193,8 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         javaWriter.beginMethod(Long.class.getSimpleName(), "create", PUBLIC, "final " + modelSimpleName, " entity");
 
         javaWriter.emitStatement("ContentValues values = createContentValues(entity)");
-        javaWriter.emitStatement("entity.id = mDatabase.insert(\"%s\", null, values)", tableName);
-        javaWriter.emitStatement("return entity.id");
+        javaWriter.emitStatement("entity.setId(mDatabase.insert(\"%s\", null, values))", tableName);
+        javaWriter.emitStatement("return entity.getId()");
 
         javaWriter.endMethod();
         javaWriter.emitEmptyLine();
@@ -205,8 +205,8 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         javaWriter.beginMethod(Long.class.getSimpleName(), "update", PUBLIC, "final " + modelSimpleName, " entity");
 
         javaWriter.emitStatement("ContentValues values = createContentValues(entity)");
-        javaWriter.emitStatement("mDatabase.update(\"%s\", values, Model.COLUMN_ID + \"=?\", new String[]{entity.id.toString()})", tableName);
-        javaWriter.emitStatement("return entity.id");
+        javaWriter.emitStatement("mDatabase.update(\"%s\", values, Model.COLUMN_ID + \"=?\", new String[]{entity.getId().toString()})", tableName);
+        javaWriter.emitStatement("return entity.getId()");
 
         javaWriter.endMethod();
         javaWriter.emitEmptyLine();
@@ -239,7 +239,11 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
                 value.append(")");
             }
 
-            writer.emitStatement("entity." + column.getFieldName() + " = " + value.toString());
+            if (column.getSetter() == null) {
+                writer.emitStatement("entity.%s = %s", column.getFieldName(), value.toString());
+            } else {
+                writer.emitStatement("entity.%s(%s)", column.getSetter().getSimpleName(), value.toString());
+            }
         }
 
         writer.endMethod();
@@ -250,7 +254,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writer.emitAnnotation(Override.class);
         writer.beginMethod(Long.class.getSimpleName(), "createOrUpdate", PUBLIC, "final " + modelSimpleName, "entity");
 
-        writer.beginControlFlow("if (entity.id == null)");
+        writer.beginControlFlow("if (entity.getId() == null)");
         writer.emitStatement("return create(entity)");
         writer.nextControlFlow("else");
         writer.emitStatement("return update(entity)");
@@ -264,7 +268,7 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writer.emitAnnotation(Override.class);
         writer.beginMethod(void.class.getSimpleName(), "delete", PUBLIC, "final " + modelSimpleName, "entity");
 
-        writer.emitStatement("mDatabase.delete(\"%s\", \"%s=?\", new String[]{entity.id.toString()});", tableName, Model.COLUMN_ID);
+        writer.emitStatement("mDatabase.delete(\"%s\", \"%s=?\", new String[]{entity.getId().toString()});", tableName, Model.COLUMN_ID);
 
         writer.endMethod();
         writer.emitEmptyLine();
@@ -274,8 +278,8 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writer.emitAnnotation(Override.class);
         writer.beginMethod(void.class.getSimpleName(), "putEntity", PUBLIC, "final " + modelSimpleName, "entity");
 
-        writer.beginControlFlow("if (entity.id != null)");
-        writer.emitStatement("mCache.put(getEntityIdentifier(entity.id), entity)");
+        writer.beginControlFlow("if (entity.getId() != null)");
+        writer.emitStatement("mCache.put(getEntityIdentifier(entity.getId()), entity)");
         writer.endControlFlow();
 
         writer.endMethod();
@@ -296,8 +300,8 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
         writer.emitAnnotation(Override.class);
         writer.beginMethod(void.class.getSimpleName(), "removeEntity", PUBLIC, "final " + modelSimpleName, "entity");
 
-        writer.beginControlFlow("if (entity.id != null)");
-        writer.emitStatement("mCache.remove(getEntityIdentifier(entity.id))");
+        writer.beginControlFlow("if (entity.getId() != null)");
+        writer.emitStatement("mCache.remove(getEntityIdentifier(entity.getId()))");
         writer.endControlFlow();
 
         writer.endMethod();
@@ -345,11 +349,21 @@ public class ModelRepositoryWriter implements SourceWriter<TypeElement> {
                      .append(".class).serialize(");
             }
 
-            value.append("entity.").append(column.getFieldName());
+            if (column.getGetter() == null) {
+                value.append("entity.").append(column.getFieldName());
+            } else {
+                value.append("entity.").append(column.getGetter().toString());
+            }
 
             if (column.isModel()) {
                 value.append(" != null ? ");
-                value.append("entity.").append(column.getFieldName()).append(".id");
+                value.append("entity.");
+                if (column.getGetter() == null) {
+                    value.append(column.getFieldName());
+                } else {
+                    value.append(column.getGetter().toString());
+                }
+                value.append(".getId()");
                 value.append(" : null");
             }
 

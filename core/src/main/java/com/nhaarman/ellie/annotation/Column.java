@@ -35,6 +35,7 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 @Target(FIELD)
 @Retention(CLASS)
 public @interface Column {
+
 	/**
 	 * Returns the column name.
 	 *

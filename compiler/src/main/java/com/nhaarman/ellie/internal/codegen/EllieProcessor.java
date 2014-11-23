@@ -18,6 +18,8 @@ package com.nhaarman.ellie.internal.codegen;
 
 import com.google.common.collect.ImmutableSet;
 import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.GetterFor;
+import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
 import com.nhaarman.ellie.internal.Migration;
 import com.nhaarman.ellie.internal.TypeAdapter;
@@ -53,7 +55,9 @@ public class EllieProcessor extends AbstractProcessor {
                 Migration.class.getName(),
                 TypeAdapter.class.getName(),
                 Table.class.getName(),
-                Column.class.getName()
+                Column.class.getName(),
+                GetterFor.class.getName(),
+                SetterFor.class.getName()
         );
     }
 

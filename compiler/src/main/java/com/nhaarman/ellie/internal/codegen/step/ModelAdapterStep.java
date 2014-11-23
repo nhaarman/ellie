@@ -16,28 +16,33 @@
 
 package com.nhaarman.ellie.internal.codegen.step;
 
+import com.nhaarman.ellie.annotation.Column;
+import com.nhaarman.ellie.annotation.GetterFor;
+import com.nhaarman.ellie.annotation.SetterFor;
+import com.nhaarman.ellie.annotation.Table;
+import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
+import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
 import com.nhaarman.ellie.internal.codegen.validator.ColumnValidator;
+import com.nhaarman.ellie.internal.codegen.validator.GetterForValidator;
 import com.nhaarman.ellie.internal.codegen.validator.ModelAdapterValidator;
+import com.nhaarman.ellie.internal.codegen.validator.SetterForValidator;
 import com.nhaarman.ellie.internal.codegen.writer.ModelAdapterWriter;
 import com.nhaarman.ellie.internal.codegen.writer.SourceWriter;
 
-import com.nhaarman.ellie.annotation.Column;
-import com.nhaarman.ellie.annotation.Table;
-import com.nhaarman.ellie.internal.codegen.Registry;
-import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
-
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.Elements;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
+import javax.tools.JavaFileObject;
 
 public class ModelAdapterStep implements ProcessingStep {
 	private Registry registry;
@@ -45,6 +50,8 @@ public class ModelAdapterStep implements ProcessingStep {
 	private Filer filer;
 	private ModelAdapterValidator validator;
 	private ColumnValidator columnValidator;
+	private GetterForValidator mGetterForValidator;
+	private SetterForValidator mSetterForValidator;
 	private SourceWriter sourceWriter;
 
 	public ModelAdapterStep(Registry registry) {
@@ -52,6 +59,8 @@ public class ModelAdapterStep implements ProcessingStep {
 		this.elements = registry.getElements();
 		this.filer = registry.getFiler();
 		this.validator = new ModelAdapterValidator(registry);
+		mGetterForValidator = new GetterForValidator(registry);
+		mSetterForValidator = new SetterForValidator(registry);
 		this.columnValidator = new ColumnValidator(registry);
 		this.sourceWriter = new ModelAdapterWriter(registry);
 	}
@@ -64,6 +73,7 @@ public class ModelAdapterStep implements ProcessingStep {
 				registry.addModelAdapterElement(new ModelAdapterElement((TypeElement) tableElement));
 
 				addColumnElements((TypeElement) tableElement);
+				addAccessors((TypeElement) tableElement);
 
 				try {
 					String name = sourceWriter.createSourceName(tableElement);
@@ -82,12 +92,40 @@ public class ModelAdapterStep implements ProcessingStep {
 
 	private void addColumnElements(TypeElement element) {
 		final List<? extends Element> members = elements.getAllMembers(element);
-		boolean isColumn;
 
 		for (Element member : members) {
-			isColumn = (member.getAnnotation(Column.class) != null);
-			if (isColumn && columnValidator.validate(element, member)) {
+			if (member.getAnnotation(Column.class) != null && columnValidator.validate(element, member)) {
 				registry.addColumnElement(new ColumnElement(registry, element, (VariableElement) member));
+			}
+		}
+	}
+
+	private void addAccessors(TypeElement element) {
+		final List<? extends Element> members = elements.getAllMembers(element);
+
+		for (Element member : members) {
+			if (member.getAnnotation(GetterFor.class) != null && mGetterForValidator.validate(element, member)) {
+				addGetter(element, member);
+			} else if (member.getAnnotation(SetterFor.class) != null && mSetterForValidator.validate(element, member)) {
+				addSetter(element, member);
+			}
+		}
+	}
+
+	private void addGetter(TypeElement element, Element member) {
+		Set<ColumnElement> columnElements = registry.getColumnElements(element);
+		for (ColumnElement columnElement : columnElements) {
+			if (columnElement.getColumnName().equals(member.getAnnotation(GetterFor.class).value())) {
+				columnElement.setGetter((ExecutableElement) member);
+			}
+		}
+	}
+
+	private void addSetter(TypeElement element, Element member) {
+		Set<ColumnElement> columnElements = registry.getColumnElements(element);
+		for (ColumnElement columnElement : columnElements) {
+			if (columnElement.getColumnName().equals(member.getAnnotation(SetterFor.class).value())) {
+				columnElement.setSetter((ExecutableElement) member);
 			}
 		}
 	}

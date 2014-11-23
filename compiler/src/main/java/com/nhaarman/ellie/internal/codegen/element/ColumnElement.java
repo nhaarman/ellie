@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -45,6 +47,7 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 
 public class ColumnElement {
+
 	private static final Map<String, String> SQL_TYPE_MAP = new HashMap<String, String>() {
 		{
 			put(byte[].class.getName(), "BLOB");
@@ -64,6 +67,8 @@ public class ColumnElement {
 	};
 
 	private Column column;
+	private ExecutableElement getter;
+	private ExecutableElement setter;
 	private VariableElement element;
 	private TypeElement enclosingType;
 	private TypeElement deserializedType;
@@ -107,6 +112,22 @@ public class ColumnElement {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void setSetter(ExecutableElement executableElement) {
+		this.setter = executableElement;
+	}
+
+	public ExecutableElement getSetter() {
+		return setter;
+	}
+
+	public void setGetter(ExecutableElement executableElement) {
+		this.getter = executableElement;
+	}
+
+	public ExecutableElement getGetter() {
+		return getter;
 	}
 
 	public boolean isModel() {
