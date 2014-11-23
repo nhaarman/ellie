@@ -38,7 +38,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("rawtypes") public final class Ellie {
+@SuppressWarnings({"rawtypes", "ParameterNameDiffersFromOverriddenParameter"})
+public final class Ellie {
 
     public static final int DEFAULT_CACHE_SIZE = 1024;
 
@@ -245,7 +246,7 @@ import java.util.List;
 
     // Private classes
 
-    @SuppressWarnings("ParameterNameDiffersFromOverriddenParameter") private class DatabaseHelper extends SQLiteOpenHelper {
+    private class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(final Context context, final String name, final int version) {
             super(context, name, mLogLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);

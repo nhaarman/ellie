@@ -41,17 +41,33 @@ import com.nhaarman.ellie.internal.ModelAdapter;
  * <li>content://com.example.notes/notes/1</li>
  * </ul>
  */
-public abstract class EllieProvider extends ContentProvider {
+@SuppressWarnings({
+        "StringToUpperCaseOrToLowerCaseWithoutLocale",
+        "AssignmentToStaticFieldFromInstanceMethod",
+        "HardCodedStringLiteral"
+        , "rawtypes"
+        , "ParameterNameDiffersFromOverriddenParameter"
+}) public abstract class EllieProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
-    private static final SparseArray<Class<? extends Model>> TYPE_CODES = new SparseArray<Class<? extends Model>>();
+    private static final SparseArray<Class<? extends Model>> TYPE_CODES = new SparseArray<>();
 
-    private static final SparseArray<String> MIME_TYPE_CACHE = new SparseArray<String>();
+    private static final SparseArray<String> MIME_TYPE_CACHE = new SparseArray<>();
 
     private static boolean sIsImplemented;
 
     private static String sAuthority;
+
+    private final Ellie mEllie;
+
+    protected EllieProvider() {
+        this(Ellie.getInstance());
+    }
+
+    protected EllieProvider(final Ellie ellie) {
+        mEllie = ellie;
+    }
 
     /**
      * Returns whether the provider has been implemented.
@@ -69,8 +85,8 @@ public abstract class EllieProvider extends ContentProvider {
      *
      * @return The Uri for the model table.
      */
-    public static Uri createUri(final Class<? extends Model> type) {
-        return createUri(type, null);
+    public static Uri createUri(final Class<? extends Model> type, final Ellie ellie) {
+        return createUri(type, null, ellie);
     }
 
     /**
@@ -81,12 +97,12 @@ public abstract class EllieProvider extends ContentProvider {
      *
      * @return The Uri for the model row.
      */
-    public static Uri createUri(final Class<? extends Model> type, final Long id) {
+    public static Uri createUri(final Class<? extends Model> type, final Long id, final Ellie ellie) {
         final StringBuilder uri = new StringBuilder();
         uri.append("content://");
         uri.append(sAuthority);
         uri.append("/");
-        uri.append(Ellie.getInstance().getTableName(type).toLowerCase());
+        uri.append(ellie.getTableName(type).toLowerCase());
 
         if (id != null) {
             uri.append("/");
@@ -98,12 +114,12 @@ public abstract class EllieProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Ellie.getInstance().init(getContext(), getDatabaseName(), getDatabaseVersion(), getCacheSize(), getLogLevel());
+        mEllie.init(getContext(), getDatabaseName(), getDatabaseVersion(), getCacheSize(), getLogLevel());
         sAuthority = getAuthority();
         sIsImplemented = true;
 
         int i = 0;
-        for (ModelAdapter modelAdapter : Ellie.getInstance().getModelAdapters()) {
+        for (ModelAdapter modelAdapter : mEllie.getModelAdapters()) {
             final int tableKey = i * 2 + 1;
             final int itemKey = i * 2 + 2;
 
@@ -144,7 +160,7 @@ public abstract class EllieProvider extends ContentProvider {
         mimeType.append(".");
         mimeType.append(sAuthority);
         mimeType.append(".");
-        mimeType.append(Ellie.getInstance().getTableName(type));
+        mimeType.append(mEllie.getTableName(type));
 
         MIME_TYPE_CACHE.append(match, mimeType.toString());
 
@@ -152,12 +168,12 @@ public abstract class EllieProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(final Uri uri, final ContentValues values) {
+    public Uri insert(final Uri uri, final ContentValues contentValues) {
         final Class<? extends Model> type = getModelType(uri);
-        final Long id = Ellie.getInstance().getDatabase().insert(Ellie.getInstance().getTableName(type), null, values);
+        final Long id = mEllie.getDatabase().insert(mEllie.getTableName(type), null, contentValues);
 
-        if (id != null && id > 0) {
-            Uri retUri = createUri(type, id);
+        if (id > 0) {
+            Uri retUri = createUri(type, id, mEllie);
             getContext().getContentResolver().notifyChange(uri, null);
             return retUri;
         }
@@ -166,10 +182,10 @@ public abstract class EllieProvider extends ContentProvider {
     }
 
     @Override
-    public int update(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {
-        final int count = Ellie.getInstance().getDatabase().update(
-                Ellie.getInstance().getTableName(getModelType(uri)),
-                values,
+    public int update(final Uri uri, final ContentValues contentValues, final String selection, final String[] selectionArgs) {
+        final int count = mEllie.getDatabase().update(
+                mEllie.getTableName(getModelType(uri)),
+                contentValues,
                 selection,
                 selectionArgs
         );
@@ -181,8 +197,8 @@ public abstract class EllieProvider extends ContentProvider {
 
     @Override
     public int delete(final Uri uri, final String selection, final String[] selectionArgs) {
-        final int count = Ellie.getInstance().getDatabase().delete(
-                Ellie.getInstance().getTableName(getModelType(uri)),
+        final int count = mEllie.getDatabase().delete(
+                mEllie.getTableName(getModelType(uri)),
                 selection,
                 selectionArgs
         );
@@ -194,8 +210,8 @@ public abstract class EllieProvider extends ContentProvider {
 
     @Override
     public Cursor query(final Uri uri, final String[] projection, final String selection, final String[] selectionArgs, final String sortOrder) {
-        final Cursor cursor = Ellie.getInstance().getDatabase().query(
-                Ellie.getInstance().getTableName(getModelType(uri)),
+        final Cursor cursor = mEllie.getDatabase().query(
+                mEllie.getTableName(getModelType(uri)),
                 projection,
                 selection,
                 selectionArgs,
