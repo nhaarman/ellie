@@ -1,0 +1,82 @@
+/*
+ * Copyright (C) 2014 Niek Haarman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+task release << {
+
+    new ByteArrayOutputStream().withStream { os ->
+
+        exec {
+            commandLine 'git', 'tag'
+            standardOutput = os
+        }
+
+        if (os.toString().contains(VERSION_NAME)) {
+            throw new Exception("Tag " + VERSION_NAME + " already exists! Did you update your version number?");
+        }
+
+        String[][] commands = [
+                [
+                        "git checkout dev",
+                        "git pull origin dev",
+                        "git add .",
+                        "git commit -m \"Prepare version " + VERSION_NAME + "\"",
+                        "git checkout master",
+                        "git merge dev -m \"Releasing version " + VERSION_NAME + "\" --no-ff",
+                        "git tag -a " + VERSION_NAME + " -m \"Version " + VERSION_NAME + "\""
+                ],
+                [
+                        "git push",
+                        "git push --tags",
+                        "git checkout dev",
+                        "git push origin dev"
+                ],
+                [
+                        "gradlew.bat uploadArchives -PRELEASE=true"
+                ]
+        ]
+
+        for (String command : commands[0]) {
+            println "\n" + command
+            exec {
+                commandLine command.split(" ")
+            }
+        }
+
+        if (System.console() != null) {
+            println "\nPress enter to push changes, CTRL + C to abort."
+            System.console().readLine();
+        }
+
+        for (String command : commands[1]) {
+            println "\n" + command
+            exec {
+                commandLine command.split(" ")
+            }
+        }
+
+        if (System.console() != null) {
+            println "\nPress enter to upload archives to MavenCentral, CTRL + C to abort."
+            System.console().readLine();
+        }
+
+        for (String command : commands[2]) {
+            println "\n" + command
+            exec {
+                commandLine command.split(" ")
+            }
+        }
+    }
+}
