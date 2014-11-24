@@ -24,6 +24,7 @@ import com.nhaarman.ellie.annotation.AutoIncrement;
 import com.nhaarman.ellie.annotation.Column;
 import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.PrimaryKey;
+import com.nhaarman.ellie.annotation.SetterFor;
 
 /**
  * A Model represents a single table record and uses annotations to define the table's schema. The Model contains
@@ -52,6 +53,7 @@ public abstract class Model {
         return mId;
     }
 
+    @SetterFor(COLUMN_ID)
     public void setId(final Long id) {
         mId = id;
     }
