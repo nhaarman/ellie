@@ -144,6 +144,7 @@ import static javax.lang.model.element.Modifier.STATIC;
         }
 
         writer.emitImports(imports);
+        writer.emitEmptyLine();
     }
 
     private void writeFields(final JavaWriter javaWriter, final String modelSimpleName) throws IOException {

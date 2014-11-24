@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.internal;
+package com.nhaarman.ellie.internal.codegen;
 
 import com.google.common.base.Joiner;
 import com.google.testing.compile.JavaFileObjects;
-import com.nhaarman.ellie.internal.codegen.Errors;
 
 import org.junit.Test;
 
