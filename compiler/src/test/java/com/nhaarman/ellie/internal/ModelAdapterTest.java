@@ -41,6 +41,8 @@ public class ModelAdapterTest {
                         "import java.util.Date;",
                         "import com.nhaarman.ellie.Model;",
                         "import com.nhaarman.ellie.annotation.Column;",
+                        "import com.nhaarman.ellie.annotation.GetterFor;",
+                        "import com.nhaarman.ellie.annotation.SetterFor;",
                         "import com.nhaarman.ellie.annotation.NotNull;",
                         "import com.nhaarman.ellie.annotation.Table;",
                         "@Table(\"notes\")",
@@ -51,6 +53,8 @@ public class ModelAdapterTest {
                         "	@Column(TITLE) public String title;",
                         "	@Column(BODY) @NotNull public String body;",
                         "	@Column(DATE) public Date date;",
+                        "   @GetterFor(TITLE) public String getTitle() { return title; }",
+                        "   @SetterFor(TITLE) public void setTitle(String title) { this.title = title; }",
                         "}"
                 )
         );
@@ -173,5 +177,67 @@ public class ModelAdapterTest {
               .processedWith(ellieProcessors())
               .failsToCompile()
               .withErrorContaining(Errors.COLUMN_DUPLICATE_ERROR);
+    }
+
+    @Test
+    public void getterForHasColumn() {
+        JavaFileObject source = JavaFileObjects.forSourceString(
+                "com.nhaarman.ellie.test.Note",
+                Joiner.on('\n').join(
+                        "package com.nhaarman.ellie.test;",
+                        "import java.util.Date;",
+                        "import com.nhaarman.ellie.Model;",
+                        "import com.nhaarman.ellie.annotation.Column;",
+                        "import com.nhaarman.ellie.annotation.GetterFor;",
+                        "import com.nhaarman.ellie.annotation.NotNull;",
+                        "import com.nhaarman.ellie.annotation.Table;",
+                        "@Table(\"notes\")",
+                        "public class Note extends Model {",
+                        "	public static final String TITLE = \"title\";",
+                        "	public static final String BODY = \"body\";",
+                        "	public static final String DATE = \"date\";",
+                        "	public String title;",
+                        "	@Column(BODY) @NotNull public String body;",
+                        "	@Column(DATE) public Date date;",
+                        "   @GetterFor(TITLE) public String getTitle() { return title; }",
+                        "}"
+                )
+        );
+
+        ASSERT.about(javaSource()).that(source)
+              .processedWith(ellieProcessors())
+              .failsToCompile()
+              .withErrorContaining("@GetterFor \"title\" found without a @Column annotated field for \"title\"");
+    }
+
+    @Test
+    public void setterForHasColumn() {
+        JavaFileObject source = JavaFileObjects.forSourceString(
+                "com.nhaarman.ellie.test.Note",
+                Joiner.on('\n').join(
+                        "package com.nhaarman.ellie.test;",
+                        "import java.util.Date;",
+                        "import com.nhaarman.ellie.Model;",
+                        "import com.nhaarman.ellie.annotation.Column;",
+                        "import com.nhaarman.ellie.annotation.SetterFor;",
+                        "import com.nhaarman.ellie.annotation.NotNull;",
+                        "import com.nhaarman.ellie.annotation.Table;",
+                        "@Table(\"notes\")",
+                        "public class Note extends Model {",
+                        "	public static final String TITLE = \"title\";",
+                        "	public static final String BODY = \"body\";",
+                        "	public static final String DATE = \"date\";",
+                        "	public String title;",
+                        "	@Column(BODY) @NotNull public String body;",
+                        "	@Column(DATE) public Date date;",
+                        "   @SetterFor(TITLE) public void setTitle(String title) { this.title = title; }",
+                        "}"
+                )
+        );
+
+        ASSERT.about(javaSource()).that(source)
+              .processedWith(ellieProcessors())
+              .failsToCompile()
+              .withErrorContaining("@SetterFor \"title\" found without a @Column annotated field for \"title\"");
     }
 }
