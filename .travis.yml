@@ -5,5 +5,8 @@ jdk: oraclejdk8
 script:
  - ./gradlew clean test assemble --stacktrace
 
+after_success:
+  - if [[ $TRAVIS_BRANCH == 'dev' && $TRAVIS_PULL_REQUEST == 'false' ]]; then ./gradlew uploadArchives -PNEXUS_USERNAME=$NEXUS_USERNAME -PNEXUS_PASSWORD=$NEXUS_PASSWORD ; fi
+
 notifications:
   email: false

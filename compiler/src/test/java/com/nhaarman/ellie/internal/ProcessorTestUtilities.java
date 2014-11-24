@@ -28,7 +28,7 @@ public class ProcessorTestUtilities {
     private ProcessorTestUtilities() {
     }
 
-    static Iterable<? extends Processor> ellieProcessors() {
+    public static Iterable<? extends Processor> ellieProcessors() {
         return Arrays.asList(
                 new EllieProcessor()
         );
