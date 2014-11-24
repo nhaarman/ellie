@@ -30,8 +30,8 @@ Grab via Maven:
 or Gradle:
 
 ```groovy
-compile 'com.nhaarman.ellie:core:0.0.1'
-provided 'com.nhaarman.ellie:compiler:0.0.1'
+compile 'com.nhaarman.ellie:core:0.0.2'
+provided 'com.nhaarman.ellie:compiler:0.0.2'
 ```
 
 Build
