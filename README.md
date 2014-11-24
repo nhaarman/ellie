@@ -17,12 +17,12 @@ Grab via Maven:
 <dependency>
   <groupId>com.nhaarman.ellie</groupId>
   <artifactId>core</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 </dependency>
 <dependency>
   <groupId>com.nhaarman.ellie</groupId>
   <artifactId>compiler</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
   <optional>true</optional>
 </dependency>
 ```
