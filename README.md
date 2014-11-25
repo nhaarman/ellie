@@ -1,5 +1,6 @@
 Ellie
 =====
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nhaarman/ellie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Compile-time active record ORM for Android.
 
