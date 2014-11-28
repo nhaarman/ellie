@@ -18,84 +18,123 @@
 package com.nhaarman.ellie;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursor;
-import android.database.sqlite.SQLiteCursorDriver;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQuery;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.util.Log;
 
 import com.nhaarman.ellie.internal.AdapterHolder;
+import com.nhaarman.ellie.internal.DatabaseHelper;
 import com.nhaarman.ellie.internal.ModelAdapter;
 import com.nhaarman.ellie.internal.RepositoryHolder;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-@SuppressWarnings({"rawtypes", "ParameterNameDiffersFromOverriddenParameter"})
+/**
+ * The main class used in Ellie.
+ * This class is responsible for database creation/migrations, and instantiates the {@link ModelRepository} classes.
+ * Users must call {@link #init(Context, String, int, int, LogLevel)} or any of its variants before using the class in any other way.
+ */
+@SuppressWarnings("rawtypes")
 public final class Ellie {
 
+    /**
+     * The default cache size that is used by each {@link ModelRepository}.
+     */
     public static final int DEFAULT_CACHE_SIZE = 1024;
 
     private static final String TAG = "Ellie";
 
+    @NotNull
     private static Ellie sInstance = new Ellie();
 
     /**
      * Controls the level of logging.
      */
     public enum LogLevel {
+
         /**
          * No logging.
          */
         NONE,
+
         /**
          * Log basic events.
          */
         BASIC,
+
         /**
          * Log all queries.
          */
         FULL;
 
+        /**
+         * Returns whether this level is higher than the given level.
+         *
+         * @param logLevel The {@code LogLevel} to check against.
+         *
+         * @return {@code true} if this level is higher than given level.
+         */
         public boolean log(final LogLevel logLevel) {
             return ordinal() >= logLevel.ordinal();
         }
     }
 
+    /**
+     * The {@link AdapterHolder} instance that is instantiated to access the {@link ModelAdapter}s, {@link TypeAdapter}s, and {@link Migration}s.
+     * This value is {@code null} until {@link #init(Context, String, int, int, LogLevel)} is successfully called.
+     */
+    @Nullable
     private AdapterHolder mAdapterHolder;
 
+    /**
+     * The {@link RepositoryHolder} instance that is instantiated to access the {@link ModelRepository} instances.
+     * This value is {@code null} until {@link #init(Context, String, int, int, LogLevel)} is successfully called.
+     */
+    @Nullable
     private RepositoryHolder mRepositoryHolder;
 
+    /**
+     * The writable {@link SQLiteDatabase} that is used.
+     * This value is {@code null} until {@link #init(Context, String, int, int, LogLevel)} is successfully called.
+     */
+    @Nullable
     private SQLiteDatabase mSQLiteDatabase;
 
-    private LogLevel mLogLevel = LogLevel.NONE;
-
+    /**
+     * Indicates whether we're fully initialized.
+     */
     private boolean mInitialized;
 
+    /**
+     * Returns the main instance of {@code Ellie} that is used in classes when not injected.
+     * To have this method return a custom instance, call {@link #useInstance(Ellie)} with your instance.
+     *
+     * @return The {@code Ellie} instance.
+     */
+    @NotNull
     public static Ellie getInstance() {
         synchronized (Ellie.class) {
-            if (sInstance == null) {
-                sInstance = new Ellie();
-            }
-
             return sInstance;
         }
     }
 
-    public static void useInstance(final Ellie ellie) {
+    /**
+     * Instructs Ellie to use given {@code Ellie} instance whenever the {@code Ellie} instance isn't supplied
+     * explicitely to classes that depend on {@code Ellie}.
+     * After calling this method, {@link #getInstance()} will return given instance.
+     *
+     * @param ellie The {@code Ellie} instance to use.
+     */
+    public static void useInstance(@NotNull final Ellie ellie) {
         synchronized (Ellie.class) {
-            sInstance = ellie;
+            sInstance = Objects.requireNonNull(ellie);
         }
     }
-
-    // Public methods
 
     /**
      * Initialize the database. Must be called before interacting with the database.
@@ -104,7 +143,7 @@ public final class Ellie {
      * @param name    The database name.
      * @param version The database version.
      */
-    public void init(final Context context, final String name, final int version) {
+    public void init(@NotNull final Context context, @NotNull final String name, final int version) {
         init(context, name, version, DEFAULT_CACHE_SIZE, LogLevel.NONE);
     }
 
@@ -116,7 +155,7 @@ public final class Ellie {
      * @param version   The database version.
      * @param cacheSize The cache size.
      */
-    public void init(final Context context, final String name, final int version, final int cacheSize) {
+    public void init(@NotNull final Context context, @NotNull final String name, final int version, final int cacheSize) {
         init(context, name, version, cacheSize, LogLevel.NONE);
     }
 
@@ -128,7 +167,7 @@ public final class Ellie {
      * @param version  The database version.
      * @param logLevel The logging level.
      */
-    public void init(final Context context, final String name, final int version, final LogLevel logLevel) {
+    public void init(@NotNull final Context context, @NotNull final String name, final int version, @NotNull final LogLevel logLevel) {
         init(context, name, version, DEFAULT_CACHE_SIZE, logLevel);
     }
 
@@ -141,7 +180,11 @@ public final class Ellie {
      * @param cacheSize The cache size.
      * @param logLevel  The logging level.
      */
-    public void init(final Context context, final String name, final int version, final int cacheSize, final LogLevel logLevel) {
+    public void init(@NotNull final Context context, @NotNull final String name, final int version, final int cacheSize, @NotNull final LogLevel logLevel) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(name);
+        Objects.requireNonNull(logLevel);
+
         if (mInitialized) {
             if (logLevel.log(LogLevel.BASIC)) {
                 Log.d(TAG, "Already initialized.");
@@ -149,180 +192,149 @@ public final class Ellie {
             return;
         }
 
-        mLogLevel = logLevel;
-
-        try {
-            Class<? extends AdapterHolder> adapterHolderClass = (Class<? extends AdapterHolder>) Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
-            Constructor<? extends AdapterHolder> constructor = adapterHolderClass.getConstructor();
-            mAdapterHolder = constructor.newInstance();
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
-
-        DatabaseHelper databaseHelper = new DatabaseHelper(context.getApplicationContext(), name, version);
-        mSQLiteDatabase = databaseHelper.getWritableDatabase();
-
-        try {
-            Class<? extends RepositoryHolder> adapterHolderClass = (Class<? extends RepositoryHolder>) Class.forName(RepositoryHolder.IMPL_CLASS_FQCN);
-            Constructor<? extends RepositoryHolder> constructor = adapterHolderClass.getConstructor(Ellie.class, SQLiteDatabase.class, int.class);
-            mRepositoryHolder = constructor.newInstance(this, mSQLiteDatabase, cacheSize);
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-            throw new IllegalStateException(e);
-        }
+        mAdapterHolder = instantiateAdapterHolder();
+        mSQLiteDatabase = createSQLiteDatabase(context, name, version, mAdapterHolder, logLevel);
+        mRepositoryHolder = instantiateRepositoryHolder(mSQLiteDatabase, cacheSize);
 
         mInitialized = true;
     }
 
+    /**
+     * Uses reflection to instantiate the {@link AdapterHolder} class generated by the compiler module.
+     *
+     * @throws IllegalStateException if the class could not be instantiated.
+     */
+    @NotNull
+    private AdapterHolder instantiateAdapterHolder() {
+        try {
+            Class<? extends AdapterHolder> adapterHolderClass = (Class<? extends AdapterHolder>) Class.forName(AdapterHolder.IMPL_CLASS_FQCN);
+            Constructor<? extends AdapterHolder> constructor = adapterHolderClass.getConstructor(AdapterHolder.CONSTRUCTOR_CLASSES);
+            return constructor.newInstance();
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalStateException("Could not instantiate AdapterHolder class. Make sure code generation has completed", e);
+        }
+    }
+
+    /**
+     * Creates the {@link SQLiteDatabase} that is used.
+     *
+     * @param context       Context
+     * @param name          The database name.
+     * @param version       The database version.
+     * @param adapterHolder The {@link AdapterHolder}.
+     * @param logLevel      The logging level.
+     *
+     * @return the {@code SQLiteDatabase}.
+     */
+    @NotNull
+    private SQLiteDatabase createSQLiteDatabase(@NotNull final Context context, @NotNull final String name, final int version,
+                                                @NotNull final AdapterHolder adapterHolder, @NotNull final LogLevel logLevel) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(context.getApplicationContext(), name, version, adapterHolder, logLevel);
+        return databaseHelper.getWritableDatabase();
+    }
+
+    /**
+     * Uses reflection to instantiate the {@link RepositoryHolder} class generated by the compiler module.
+     *
+     * @param database  The {@link SQLiteDatabase} to pass to the {@code RepositoryHolder}.
+     * @param cacheSize The size of the cache to use for each {@code RepositoryHolder}.
+     *
+     * @throws IllegalStateException if the class could not be instantiated.
+     */
+    @NotNull
+    private RepositoryHolder instantiateRepositoryHolder(final SQLiteDatabase database, final int cacheSize) {
+        try {
+            Class<? extends RepositoryHolder> adapterHolderClass = (Class<? extends RepositoryHolder>) Class.forName(RepositoryHolder.IMPL_CLASS_FQCN);
+            Constructor<? extends RepositoryHolder> constructor = adapterHolderClass.getConstructor(RepositoryHolder.CONSTRUCTOR_CLASSES);
+            return constructor.newInstance(this, database, cacheSize);
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalStateException("Could not instantiate RepositoryHolder class. Make sure code generation has completed.", e);
+        }
+    }
+
+    /**
+     * Returns the {@link SQLiteDatabase} instance that is used.
+     *
+     * @return The {@code SQLiteDatabase} instance.
+     */
+    @NotNull
     public SQLiteDatabase getDatabase() {
+        if (mSQLiteDatabase == null) {
+            throw new IllegalStateException("Ellie hasn't been initialized yet. Did you call Ellie#init(...)?");
+        }
+
         return mSQLiteDatabase;
     }
 
-    public <T extends Model> String getTableName(final Class<T> cls) {
-        return mAdapterHolder.getModelAdapter(cls).getTableName();
-    }
-
-    // Convenience methods
-
     /**
-     * Iterate over a cursor and load entities.
+     * Returns the table name for the model represented by given type class.
      *
-     * @param <T>    The Model type
-     * @param cls    The Model class.
-     * @param cursor The result cursor.
+     * @param cls The type class.
+     * @param <T> The Model extension to get the table name for.
      *
-     * @return The list of entities.
+     * @return The table name.
      */
-    public <T extends Model> List<T> processCursor(final Class<T> cls, final Cursor cursor) {
-        final List<T> entities = new ArrayList<>();
-        try {
-            Constructor<T> entityConstructor = cls.getConstructor();
-            if (cursor.moveToFirst()) {
-                do {
-                    T entity = getModelRepository(cls).getEntity(cursor.getLong(cursor.getColumnIndex(Model.COLUMN_ID)));
-                    if (entity == null) {
-                        entity = entityConstructor.newInstance();
-                    }
-
-                    entity.load(cursor);
-                    entities.add(entity);
-                }
-                while (cursor.moveToNext());
-            }
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            throw new IllegalStateException(e);
+    @NotNull
+    public <T extends Model> String getTableName(final Class<T> cls) {
+        if (mAdapterHolder == null) {
+            throw new IllegalStateException("Ellie hasn't been initialized yet. Did you call Ellie#init(...)?");
         }
 
-        return entities;
+        ModelAdapter<Model> modelAdapter = Objects.requireNonNull(
+                mAdapterHolder.getModelAdapter(cls),
+                cls.getSimpleName() + " has no declared table name! Did you add the @Table annotation?"
+        );
+
+        return modelAdapter.getTableName();
     }
 
     /**
-     * Iterate over a cursor and load entities. Closes the cursor when finished.
+     * Returns the {@link ModelRepository} instance for given type class, if it exists.
      *
-     * @param <T>    The Model type
-     * @param cls    The model class.
-     * @param cursor The result cursor.
+     * @param cls The type class.
+     * @param <T> The type of the class extending {@link Model}.
      *
-     * @return The list of entities.
+     * @return The {@code ModelRepository} instance, or {@code null} if it doesn't exist.
      */
-    public <T extends Model> List<T> processAndCloseCursor(final Class<T> cls, final Cursor cursor) {
-        List<T> entities = processCursor(cls, cursor);
-        cursor.close();
-        return entities;
-    }
-
-    // Finder methods
-
-    List<? extends ModelAdapter> getModelAdapters() {
-        return mAdapterHolder.getModelAdapters();
-    }
-
+    @Nullable
     public <T extends Model> ModelRepository<T> getModelRepository(final Class<T> cls) {
+        if (mRepositoryHolder == null) {
+            throw new IllegalStateException("Ellie hasn't been initialized yet. Did you call Ellie#init(...)?");
+        }
+
         return mRepositoryHolder.getModelRepository(cls);
     }
 
+    /**
+     * Returns all instantiated {@link ModelAdapter}s.
+     *
+     * @return The list of {@code ModelAdapter}s.
+     */
+    @NotNull
+    List<? extends ModelAdapter> getModelAdapters() {
+        if (mAdapterHolder == null) {
+            throw new IllegalStateException("Ellie hasn't been initialized yet. Did you call Ellie#init(...)?");
+        }
+
+        return mAdapterHolder.getModelAdapters();
+    }
+
+
+    /**
+     * Returns the {@link TypeAdapter} to use for (de)serializing classes with given type.
+     *
+     * @param cls The deserialized type class.
+     * @param <D> Deserialized type, i.e. the Java type.
+     * @param <S> Serialized type, i.e. the SQLite type.
+     *
+     * @return The {@code TypeAdapter}, or {@code null} if there is none for given class.
+     */
+    @Nullable
     <D, S> TypeAdapter<D, S> getTypeAdapter(final Class<D> cls) {
+        if (mAdapterHolder == null) {
+            throw new IllegalStateException("Ellie hasn't been initialized yet. Did you call Ellie#init(...)?");
+        }
+
         return (TypeAdapter<D, S>) mAdapterHolder.getTypeAdapter(cls);
-    }
-
-    // Private classes
-
-    private class DatabaseHelper extends SQLiteOpenHelper {
-
-        DatabaseHelper(final Context context, final String name, final int version) {
-            super(context, name, mLogLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);
-        }
-
-        @Override
-        public void onOpen(final SQLiteDatabase db) {
-            executePragmas(db);
-        }
-
-        @Override
-        public void onCreate(final SQLiteDatabase sqLiteDatabase) {
-            executePragmas(sqLiteDatabase);
-            executeCreate(sqLiteDatabase);
-            executeMigrations(sqLiteDatabase, -1, sqLiteDatabase.getVersion());
-        }
-
-        @Override
-        public void onUpgrade(final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
-            executePragmas(sqLiteDatabase);
-            executeCreate(sqLiteDatabase);
-            executeMigrations(sqLiteDatabase, oldVersion, newVersion);
-        }
-
-        private void executePragmas(final SQLiteDatabase db) {
-            if (VERSION.SDK_INT >= VERSION_CODES.FROYO) {
-                db.execSQL("PRAGMA foreign_keys=ON;");
-            }
-        }
-
-        private void executeCreate(final SQLiteDatabase db) {
-            final List<String> tableDefinitions = new ArrayList<>();
-            for (ModelAdapter<?> modelAdapter : mAdapterHolder.getModelAdapters()) {
-                tableDefinitions.add(modelAdapter.getSchema());
-            }
-
-            db.beginTransaction();
-            try {
-                for (String tableDefinition : tableDefinitions) {
-                    db.execSQL(tableDefinition);
-                }
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
-            }
-        }
-
-        private boolean executeMigrations(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-            boolean migrationExecuted = false;
-            final List<? extends Migration> migrations = mAdapterHolder.getMigrations();
-
-            db.beginTransaction();
-            try {
-                for (Migration migration : migrations) {
-                    if (migration.getVersion() > oldVersion && migration.getVersion() <= newVersion) {
-                        for (String statement : migration.getStatements()) {
-                            db.execSQL(statement);
-                        }
-                        migrationExecuted = true;
-                    }
-                }
-            } finally {
-                db.setTransactionSuccessful();
-            }
-            db.endTransaction();
-
-            return migrationExecuted;
-        }
-    }
-
-    private static class LoggingCursorAdapter implements CursorFactory {
-
-        @Override
-        public Cursor newCursor(final SQLiteDatabase sqLiteDatabase, final SQLiteCursorDriver sqLiteCursorDriver, final String editTable, final SQLiteQuery sqLiteQuery) {
-            Log.v(TAG, sqLiteQuery.toString());
-            return new SQLiteCursor(sqLiteCursorDriver, editTable, sqLiteQuery);
-        }
     }
 }

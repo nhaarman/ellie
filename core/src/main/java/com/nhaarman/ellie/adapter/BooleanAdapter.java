@@ -21,7 +21,7 @@ import com.nhaarman.ellie.TypeAdapter;
 
 /**
  * <p>
- * Converts Java {@link java.lang.Boolean} values to SQLite INTEGER values.
+ * Converts Java {@link Boolean} values to SQLite INTEGER values.
  * </p>
  */
 public class BooleanAdapter extends TypeAdapter<Boolean, Integer> {
@@ -34,7 +34,7 @@ public class BooleanAdapter extends TypeAdapter<Boolean, Integer> {
      * @return {@inheritDoc}
      */
     @Override
-    public Integer serialize(Boolean value) {
+    public Integer serialize(final Boolean value) {
         return value ? 1 : 0;
     }
 
@@ -46,7 +46,7 @@ public class BooleanAdapter extends TypeAdapter<Boolean, Integer> {
      * @return {@inheritDoc}
      */
     @Override
-    public Boolean deserialize(Integer value) {
+    public Boolean deserialize(final Integer value) {
         return value != 0;
     }
 }

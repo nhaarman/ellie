@@ -26,42 +26,72 @@ import com.nhaarman.ellie.annotation.GetterFor;
 import com.nhaarman.ellie.annotation.PrimaryKey;
 import com.nhaarman.ellie.annotation.SetterFor;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
- * A Model represents a single table record and uses annotations to define the table's schema. The Model contains
- * methods for interacting with the database directly.
+ * A Model represents a single table record and uses annotations to define the table's schema.
+ * The Model contains methods for interacting with the database directly.
  */
 public abstract class Model {
 
+    /**
+     * The name of the id column.
+     */
     public static final String COLUMN_ID = BaseColumns._ID;
 
+    /**
+     * The {@link ModelRepository} that is used to query the database.
+     */
     @SuppressWarnings("rawtypes")
     private final ModelRepository mRepository;
 
-    @Column(COLUMN_ID) @PrimaryKey @AutoIncrement
+    @Nullable
+    @Column(COLUMN_ID)
+    @PrimaryKey
+    @AutoIncrement
     protected Long mId;
 
+    /**
+     * Creates a new instance of the {@code Model} using the default {@link Ellie} instance
+     * to retrieve the {@link ModelRepository} to use.
+     */
     protected Model() {
         mRepository = Ellie.getInstance().getModelRepository(getClass());
     }
 
+    /**
+     * Creates a new instance of the {@code Model} using given {@link ModelRepository}.
+     *
+     * @param repository The {@link ModelRepository} to use for querying the database.
+     */
     protected Model(final ModelRepository<? extends Model> repository) {
         mRepository = repository;
     }
 
+    /**
+     * Returns the id of this {@code Model} instance.
+     *
+     * @return The id, or {@code null} if it doesn't exist in the database.
+     */
+    @Nullable
     @GetterFor(COLUMN_ID)
     public Long getId() {
         return mId;
     }
 
+    /**
+     * Sets given id to this {@code Model} instance.
+     *
+     * @param id The id to set.
+     */
     @SetterFor(COLUMN_ID)
-    public void setId(final Long id) {
+    public void setId(@Nullable final Long id) {
         mId = id;
     }
 
     /**
-     * <p>
      * Load this objects values from a cursor.
-     * </p>
      *
      * @param cursor The Cursor to load values from.
      */
@@ -78,6 +108,7 @@ public abstract class Model {
      *
      * @return The record id.
      */
+    @NotNull
     public final Long save() {
         if (mId == null) {
             mId = mRepository.create(this);
@@ -90,9 +121,7 @@ public abstract class Model {
     }
 
     /**
-     * <p>
-     * Delete the record from the database.
-     * </p>
+     * Deletes the record from the database.
      */
     public final void delete() {
         mRepository.delete(this);
@@ -102,14 +131,12 @@ public abstract class Model {
     }
 
     /**
-     * <p>
-     * Notify observers that this record has changed.
-     * </p>
+     * Notifies observers that this record has changed.
      */
     private void notifyChange() {
-//		if (EllieProvider.isImplemented()) {
-//			mEllie.getContext().getContentResolver().notifyChange(EllieProvider.createUri(getClass(), id), null);
-//		}
+//        if (EllieProvider.isImplemented()) {
+//            mEllie.getContext().getContentResolver().notifyChange(EllieProvider.createUri(getClass(), id), null);
+//        }
     }
 
     @Override

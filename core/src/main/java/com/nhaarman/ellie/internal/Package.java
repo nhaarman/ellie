@@ -15,25 +15,12 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.test.model.migration;
+package com.nhaarman.ellie.internal;
 
+public final class Package {
 
-import com.nhaarman.ellie.Migration;
+    public static final String PACKAGE_NAME = "com.nhaarman.ellie";
 
-import org.jetbrains.annotations.NotNull;
-
-public class AddDateColumnMigration extends Migration {
-
-    @Override
-    public int getVersion() {
-        return 2;
-    }
-
-    @Override
-    @NotNull
-    public String[] getStatements() {
-        return new String[]{
-                "ALTER TABLE notes ADD COLUMN date INTEGER"
-        };
+    private Package() {
     }
 }
