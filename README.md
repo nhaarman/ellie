@@ -5,6 +5,7 @@ Ellie
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nhaarman/ellie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![In Progress](https://badge.waffle.io/nhaarman/ellie.svg?label=in-progress&title=In Progress)](http://waffle.io/nhaarman/ellie)
+[![Ready for Release](https://badge.waffle.io/nhaarman/ellie.svg?label=next-release&title=Ready for Release)](http://waffle.io/nhaarman/ellie)
 
 Compile-time active record ORM for Android.
 
