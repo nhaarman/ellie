@@ -101,23 +101,28 @@ public abstract class Model {
     }
 
     /**
-     * <p>
-     * Persist the record to the database. Inserts the record if it does not exists and updates the record if it
-     * does exists.
-     * </p>
+     * Persist the record to the database.
+     * Inserts the record if it does not exists and updates the record if it does exists.
      *
-     * @return The record id.
+     * @return The record id, or {@code -1} if an error occurred.
      */
     @NotNull
     public final Long save() {
+        Long result;
+
         if (mId == null) {
-            mId = mRepository.create(this);
+            result = mRepository.create(this);
         } else {
-            mRepository.update(this);
+            result = mRepository.update(this);
         }
-        mRepository.putEntity(this);
-        notifyChange();
-        return mId;
+
+        if (result != -1) {
+            mId = result;
+            mRepository.putEntity(this);
+            notifyChange();
+        }
+
+        return result;
     }
 
     /**
