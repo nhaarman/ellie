@@ -97,8 +97,7 @@ import static javax.lang.model.element.Modifier.STATIC;
 
         writeImports(javaWriter, modelQualifiedName, columns);
 
-        javaWriter.beginType(classSimpleName, "class", PUBLIC_FINAL, null, "ModelRepository<" + modelSimpleName + ">");
-        javaWriter.emitEmptyLine();
+        writeBeginType(javaWriter, classSimpleName, modelSimpleName, modelQualifiedName);
 
         writeFields(javaWriter, modelSimpleName);
         writeConstructor(javaWriter);
@@ -142,8 +141,21 @@ import static javax.lang.model.element.Modifier.STATIC;
             }
         }
 
+        TypeElement modelRepositoryElement = mRegistry.getModelElement(modelQualifiedName).getModelRepositoryElement();
+        if (modelRepositoryElement != null) {
+            imports.add(modelRepositoryElement.getQualifiedName().toString());
+        }
+
         writer.emitImports(imports);
         writer.emitEmptyLine();
+    }
+
+    private void writeBeginType(final JavaWriter javaWriter, final String classSimpleName, final String modelSimpleName, final String modelQualifiedName) throws IOException {
+        TypeElement modelRepositoryElement = mRegistry.getModelElement(modelQualifiedName).getModelRepositoryElement();
+        String modelRepositoryName = modelRepositoryElement == null ? null : modelRepositoryElement.getQualifiedName().toString();
+
+        javaWriter.beginType(classSimpleName, "class", PUBLIC_FINAL, modelRepositoryName, "ModelRepository<" + modelSimpleName + ">");
+        javaWriter.emitEmptyLine();
     }
 
     private void writeFields(final JavaWriter javaWriter, final String modelSimpleName) throws IOException {

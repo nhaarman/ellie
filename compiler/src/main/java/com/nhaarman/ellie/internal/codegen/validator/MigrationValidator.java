@@ -49,7 +49,7 @@ public class MigrationValidator {
         }
 
         if (!((TypeElement) element).getSuperclass().toString().equals(BaseMigration.class.getName())) {
-            mMessager.printMessage(ERROR, "Classes annotated with @Migration should extend BaseMigration.");
+            mMessager.printMessage(ERROR, "Classes annotated with @Migration should extend BaseMigration.", element);
             return false;
         }
 

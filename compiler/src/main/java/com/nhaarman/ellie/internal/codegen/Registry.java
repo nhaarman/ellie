@@ -24,8 +24,7 @@ import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
 import com.nhaarman.ellie.internal.codegen.element.MigrationElement;
-import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
-import com.nhaarman.ellie.internal.codegen.element.ModelRepositoryElement;
+import com.nhaarman.ellie.internal.codegen.element.ModelElement;
 import com.nhaarman.ellie.internal.codegen.element.TypeAdapterElement;
 
 import java.util.ArrayList;
@@ -52,14 +51,11 @@ public class Registry {
 
     private final Filer mFiler;
 
-
     private final Map<String, TypeAdapterElement> mTypeAdapters = Maps.newHashMap();
 
     private final SetMultimap<String, ColumnElement> mColumns = LinkedHashMultimap.create();
 
-    private final Set<ModelAdapterElement> mModelAdapters = Sets.newHashSet();
-
-    private final Set<ModelRepositoryElement> mModelRepositories = Sets.newHashSet();
+    private final Set<ModelElement> mModelElements = Sets.newHashSet();
 
     private final Map<Integer, MigrationElement> mMigrationElements = Maps.newHashMap();
 
@@ -136,14 +132,14 @@ public class Registry {
 
     // Model adapters
 
-    public List<ModelAdapterElement> getModelAdapterElements() {
-        List<ModelAdapterElement> result = new ArrayList<>(mModelAdapters);
+    public List<ModelElement> getModelElements() {
+        List<ModelElement> result = new ArrayList<>(mModelElements);
 
         Collections.sort(
-                result, new Comparator<ModelAdapterElement>() {
+                result, new Comparator<ModelElement>() {
                     @Override
-                    public int compare(final ModelAdapterElement o1, final ModelAdapterElement o2) {
-                        return o1.getQualifiedName().compareTo(o2.getQualifiedName());
+                    public int compare(final ModelElement o1, final ModelElement o2) {
+                        return o1.getModelAdapterQualifiedName().compareTo(o2.getModelAdapterQualifiedName());
                     }
                 }
         );
@@ -151,15 +147,16 @@ public class Registry {
         return result;
     }
 
-    public void addModelAdapterElement(final ModelAdapterElement element) {
-        mModelAdapters.add(element);
+    public ModelElement getModelElement(String fullyQualifiedModelName) {
+        for (ModelElement modelElement : mModelElements) {
+            if (modelElement.getModelQualifiedName().equals(fullyQualifiedModelName)) {
+                return modelElement;
+            }
+        }
+        return null;
     }
 
-    public Set<ModelRepositoryElement> getModelRepositories() {
-        return mModelRepositories;
-    }
-
-    public void addModelRepositoryElement(final ModelRepositoryElement element) {
-        mModelRepositories.add(element);
+    public void addModelElement(final ModelElement element) {
+        mModelElements.add(element);
     }
 }
