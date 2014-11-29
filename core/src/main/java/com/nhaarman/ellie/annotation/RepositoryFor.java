@@ -33,9 +33,9 @@ import static java.lang.annotation.RetentionPolicy.CLASS;
 public @interface RepositoryFor {
 
     /**
-     * Returns the table name.
+     * The {@link Model} class the annotated class is a repository for.
      *
-     * @return The table name.
+     * @return The {@code Model} class.
      */
     Class<? extends Model> value();
 }

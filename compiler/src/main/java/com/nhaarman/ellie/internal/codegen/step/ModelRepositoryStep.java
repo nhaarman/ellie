@@ -60,9 +60,12 @@ public class ModelRepositoryStep implements ProcessingStep {
             }
         }
 
-        List<ModelElement> modelElements = mRegistry.getModelElements();
-        for (ModelElement modelElement : modelElements) {
-            writeModelRepository(modelElement);
+
+        if (roundEnv.processingOver()) {
+            List<ModelElement> modelElements = mRegistry.getModelElements();
+            for (ModelElement modelElement : modelElements) {
+                writeModelRepository(modelElement);
+            }
         }
     }
 
