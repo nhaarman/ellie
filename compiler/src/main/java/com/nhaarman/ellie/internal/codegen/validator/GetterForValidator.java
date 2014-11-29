@@ -22,6 +22,8 @@ import com.nhaarman.ellie.annotation.Table;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
 
+import org.jetbrains.annotations.NonNls;
+
 import java.util.Set;
 
 import javax.annotation.processing.Messager;
@@ -33,36 +35,36 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class GetterForValidator implements Validator {
 
-	private Registry mRegistry;
-	private Messager mMessager;
+    private final Registry mRegistry;
+    @NonNls private final Messager mMessager;
 
-	public GetterForValidator(Registry registry) {
-		this.mRegistry = registry;
-		this.mMessager = registry.getMessager();
-	}
+    public GetterForValidator(final Registry registry) {
+        mRegistry = registry;
+        mMessager = registry.getMessager();
+    }
 
-	@Override
-	public boolean validate(Element enclosingElement, Element element) {
-		Table table = enclosingElement.getAnnotation(Table.class);
-		if (!enclosingElement.getKind().equals(CLASS) || table == null) {
-			mMessager.printMessage(ERROR, "@GetterFor methods can only be enclosed by model classes.", element);
-			return false;
-		}
+    @Override
+    public boolean validate(final Element enclosingElement, final Element element) {
+        Table table = enclosingElement.getAnnotation(Table.class);
+        if (!enclosingElement.getKind().equals(CLASS) || table == null) {
+            mMessager.printMessage(ERROR, "@GetterFor methods can only be enclosed by model classes.", element);
+            return false;
+        }
 
-		GetterFor getter = element.getAnnotation(GetterFor.class);
-		Set<ColumnElement> existingColumns = mRegistry.getColumnElements((TypeElement) enclosingElement);
+        GetterFor getter = element.getAnnotation(GetterFor.class);
+        Set<ColumnElement> existingColumns = mRegistry.getColumnElements((TypeElement) enclosingElement);
 
-		boolean hasField = false;
-		for (ColumnElement column : existingColumns) {
-			if (column.getColumnName().equals(getter.value())) {
-				hasField = true;
-			}
-		}
+        boolean hasField = false;
+        for (ColumnElement column : existingColumns) {
+            if (column.getColumnName().equals(getter.value())) {
+                hasField = true;
+            }
+        }
 
-		if(!hasField){
-			mMessager.printMessage(ERROR, "@GetterFor \"" + getter.value() + "\" found without a @Column annotated field for \"" + getter.value() + "\".", element);
-		}
+        if (!hasField) {
+            mMessager.printMessage(ERROR, "@GetterFor \"" + getter.value() + "\" found without a @Column annotated field for \"" + getter.value() + "\".", element);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

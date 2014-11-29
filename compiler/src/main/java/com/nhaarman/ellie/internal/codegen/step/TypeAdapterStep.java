@@ -18,55 +18,56 @@
 package com.nhaarman.ellie.internal.codegen.step;
 
 import com.google.common.collect.Sets;
-import com.nhaarman.ellie.internal.codegen.Registry;
-import com.nhaarman.ellie.internal.codegen.validator.Validator;
-
 import com.nhaarman.ellie.adapter.BooleanAdapter;
 import com.nhaarman.ellie.adapter.CalendarAdapter;
 import com.nhaarman.ellie.adapter.SqlDateAdapter;
 import com.nhaarman.ellie.adapter.UtilDateAdapter;
 import com.nhaarman.ellie.internal.TypeAdapter;
-
+import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.TypeAdapterElement;
 import com.nhaarman.ellie.internal.codegen.validator.TypeAdapterValidator;
+import com.nhaarman.ellie.internal.codegen.validator.Validator;
+
+import java.util.Set;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.Set;
 
 public class TypeAdapterStep implements ProcessingStep {
-	private static final Class[] DEFAULT_TYPE_ADAPTERS = new Class[]{
-			BooleanAdapter.class,
-			CalendarAdapter.class,
-			SqlDateAdapter.class,
-			UtilDateAdapter.class
-	};
 
-	private Registry registry;
-	private Validator validator;
+    private static final Class[] DEFAULT_TYPE_ADAPTERS = {
+            BooleanAdapter.class,
+            CalendarAdapter.class,
+            SqlDateAdapter.class,
+            UtilDateAdapter.class
+    };
 
-	public TypeAdapterStep(Registry registry) {
-		this.registry = registry;
-		this.validator = new TypeAdapterValidator(registry);
-	}
+    private final Registry mRegistry;
+    private final Validator mValidator;
 
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		final Set<Element> elements = Sets.newHashSet(roundEnv.getElementsAnnotatedWith(TypeAdapter.class));
-		for (Class cls : DEFAULT_TYPE_ADAPTERS) {
-			elements.add(registry.getElements().getTypeElement(cls.getName()));
-		}
+    public TypeAdapterStep(final Registry registry) {
+        mRegistry = registry;
+        mValidator = new TypeAdapterValidator(registry);
+    }
 
-		for (Element element : elements) {
-			if (validator.validate(element.getEnclosingElement(), element)) {
-				registry.addTypeAdapterModel(new TypeAdapterElement(
-						registry.getTypes(),
-						registry.getElements(),
-						(TypeElement) element));
-			}
-		}
+    @Override
+    public void process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+        final Set<Element> elements = Sets.newHashSet(roundEnv.getElementsAnnotatedWith(TypeAdapter.class));
+        for (Class cls : DEFAULT_TYPE_ADAPTERS) {
+            elements.add(mRegistry.getElements().getTypeElement(cls.getName()));
+        }
 
-		return false;
-	}
+        for (Element element : elements) {
+            if (mValidator.validate(element.getEnclosingElement(), element)) {
+                mRegistry.addTypeAdapterModel(
+                        new TypeAdapterElement(
+                                mRegistry.getTypes(),
+                                mRegistry.getElements(),
+                                (TypeElement) element
+                        )
+                );
+            }
+        }
+    }
 }

@@ -24,9 +24,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
- * <p>
  * An annotation that indicates a method is a setter for a column.
- * </p>
  */
 @Target(METHOD)
 @Retention(CLASS)
@@ -37,5 +35,5 @@ public @interface SetterFor {
      *
      * @return The column name.
      */
-    public String value();
+    String value();
 }

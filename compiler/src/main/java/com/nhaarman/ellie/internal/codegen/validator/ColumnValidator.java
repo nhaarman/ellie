@@ -23,41 +23,42 @@ import com.nhaarman.ellie.internal.codegen.Errors;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
 
+import java.util.Set;
+
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.Set;
 
 import static javax.lang.model.element.ElementKind.CLASS;
-import static javax.lang.model.element.ElementKind.FIELD;
 import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class ColumnValidator implements Validator {
-	private Registry registry;
-	private Messager messager;
 
-	public ColumnValidator(Registry registry) {
-		this.registry = registry;
-		this.messager = registry.getMessager();
-	}
+    private final Registry mRegistry;
+    private final Messager mMessager;
 
-	@Override
-	public boolean validate(Element enclosingElement, Element element) {
-		Table table = enclosingElement.getAnnotation(Table.class);
-		if (!enclosingElement.getKind().equals(CLASS) || table == null) {
-			messager.printMessage(ERROR, "@Column fields can only be enclosed by model classes.", element);
-			return false;
-		}
+    public ColumnValidator(final Registry registry) {
+        mRegistry = registry;
+        mMessager = registry.getMessager();
+    }
 
-		Column column = element.getAnnotation(Column.class);
-		Set<ColumnElement> existingColumns = registry.getColumnElements((TypeElement) enclosingElement);
-		for (ColumnElement existingColumn : existingColumns) {
-			if (existingColumn.getColumnName().equals(column.value())) {
-				messager.printMessage(ERROR, Errors.COLUMN_DUPLICATE_ERROR + column.value(), element);
-				return false;
-			}
-		}
+    @Override
+    public boolean validate(final Element enclosingElement, final Element element) {
+        Table table = enclosingElement.getAnnotation(Table.class);
+        if (enclosingElement.getKind() != CLASS || table == null) {
+            mMessager.printMessage(ERROR, "@Column fields can only be enclosed by model classes.", element);
+            return false;
+        }
 
-		return true;
-	}
+        Column column = element.getAnnotation(Column.class);
+        Set<ColumnElement> existingColumns = mRegistry.getColumnElements((TypeElement) enclosingElement);
+        for (ColumnElement existingColumn : existingColumns) {
+            if (existingColumn.getColumnName().equals(column.value())) {
+                mMessager.printMessage(ERROR, Errors.COLUMN_DUPLICATE_ERROR + column.value(), element);
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

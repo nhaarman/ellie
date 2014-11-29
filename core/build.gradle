@@ -8,7 +8,7 @@ props.load(new FileInputStream(file('../local.properties')))
 
 def android = [
 		sdk   : props["sdk.dir"],
-		target: 'android-19'
+		target: 'android-21'
 ]
 
 repositories {
@@ -21,10 +21,14 @@ repositories {
 dependencies {
 	compile files("${android.sdk}/platforms/${android.target}/android.jar")
 
+	/* Observable events */
 	compile 'io.reactivex:rxjava:1.0.0-rc.3'
 
-	testCompile project(':compiler')
+	/* NotNull & Nullable annotations */
+	compile 'com.intellij:annotations:12.0'
 
+	/* Tests */
+	testCompile project(':compiler')
 	testCompile 'com.squareup.assertj:assertj-android:1.0.0'
 	testCompile 'junit:junit:4.11'
 	testCompile 'org.robolectric:robolectric:2.3'
@@ -50,5 +54,5 @@ class AndroidStubPlugin implements Plugin<Project> {
 }
 
 class AndroidStubPluginExtension {
-	def compileSdkVersion = 19
+	def compileSdkVersion = 21
 }

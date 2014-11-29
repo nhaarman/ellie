@@ -17,35 +17,42 @@
 
 package com.nhaarman.ellie.internal.codegen.step;
 
+import com.nhaarman.ellie.annotation.Migration;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.MigrationElement;
 import com.nhaarman.ellie.internal.codegen.validator.MigrationValidator;
-import com.nhaarman.ellie.internal.codegen.validator.Validator;
 
-import com.nhaarman.ellie.internal.Migration;
+import java.util.Set;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import java.util.Set;
 
 public class MigrationStep implements ProcessingStep {
-	private Registry registry;
-	private Validator validator;
 
-	public MigrationStep(Registry registry) {
-		this.registry = registry;
-		this.validator = new MigrationValidator();
-	}
+    private final Registry mRegistry;
 
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Migration.class);
-		for (Element element : elements) {
-			if (validator.validate(element.getEnclosingElement(), element)) {
-				registry.addMigrationElement(new MigrationElement((TypeElement) element));
-			}
-		}
-		return false;
-	}
+    private final MigrationValidator mMigrationValidator;
+
+
+    public MigrationStep(final Registry registry) {
+        mRegistry = registry;
+        mMigrationValidator = new MigrationValidator(registry);
+    }
+
+    @Override
+    public void process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(Migration.class);
+
+        for (Element element : elements) {
+            processElement(element);
+        }
+    }
+
+    private void processElement(final Element element) {
+        if (mMigrationValidator.validates(element)) {
+            MigrationElement migrationElement = new MigrationElement((TypeElement) element);
+            mRegistry.addMigrationElement(migrationElement);
+        }
+    }
 }

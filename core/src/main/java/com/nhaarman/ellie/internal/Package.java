@@ -17,19 +17,10 @@
 
 package com.nhaarman.ellie.internal;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+public final class Package {
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.CLASS;
+    public static final String PACKAGE_NAME = "com.nhaarman.ellie";
 
-/**
- * Used internally to discover migrations. Extend {@link com.nhaarman.ellie.Migration} to create a migration.
- */
-@Inherited
-@Target(TYPE)
-@Retention(CLASS)
-public @interface Migration {
-
+    private Package() {
+    }
 }

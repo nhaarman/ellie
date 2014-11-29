@@ -17,20 +17,85 @@
 
 package com.nhaarman.ellie.internal.codegen.element;
 
+
+import com.nhaarman.ellie.annotation.Migration;
+
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
 public class MigrationElement {
-	private TypeElement element;
 
-	public MigrationElement(TypeElement element) {
-		this.element = element;
-	}
+    private final TypeElement mElement;
 
-	public String getQualifiedName() {
-		return element.getQualifiedName().toString();
-	}
+    private ExecutableElement mBeforeUpElement;
+    private ExecutableElement mAfterUpElement;
+    private ExecutableElement mUpElement;
+    
+    private ExecutableElement mBeforeDownElement;
+    private ExecutableElement mDownElement;
+    private ExecutableElement mAfterDownElement;
 
-	public String getSimpleName() {
-		return element.getSimpleName().toString();
-	}
+    public MigrationElement(final TypeElement element) {
+        mElement = element;
+    }
+
+    public String getQualifiedName() {
+        return mElement.getQualifiedName().toString();
+    }
+
+    public String getSimpleName() {
+        return mElement.getSimpleName().toString();
+    }
+
+    public int getVersion() {
+        return mElement.getAnnotation(Migration.class).version();
+    }
+
+    public ExecutableElement getBeforeUpElement() {
+        return mBeforeUpElement;
+    }
+
+    public void setBeforeUpElement(final ExecutableElement beforeUpElement) {
+        mBeforeUpElement = beforeUpElement;
+    }
+
+    public ExecutableElement getAfterUpElement() {
+        return mAfterUpElement;
+    }
+
+    public void setAfterUpElement(final ExecutableElement afterUpElement) {
+        mAfterUpElement = afterUpElement;
+    }
+
+    public ExecutableElement getUpElement() {
+        return mUpElement;
+    }
+
+    public void setUpElement(final ExecutableElement upElement) {
+        mUpElement = upElement;
+    }
+
+    public ExecutableElement getAfterDownElement() {
+        return mAfterDownElement;
+    }
+
+    public void setAfterDownElement(final ExecutableElement afterDownElement) {
+        mAfterDownElement = afterDownElement;
+    }
+
+    public ExecutableElement getBeforeDownElement() {
+        return mBeforeDownElement;
+    }
+
+    public void setBeforeDownElement(final ExecutableElement beforeDownElement) {
+        mBeforeDownElement = beforeDownElement;
+    }
+
+    public ExecutableElement getDownElement() {
+        return mDownElement;
+    }
+
+    public void setDownElement(final ExecutableElement downElement) {
+        mDownElement = downElement;
+    }
 }

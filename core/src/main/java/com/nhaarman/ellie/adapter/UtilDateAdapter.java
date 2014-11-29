@@ -22,9 +22,7 @@ import com.nhaarman.ellie.TypeAdapter;
 import java.util.Date;
 
 /**
- * <p>
- * Converts Java {@link java.util.Date} values to SQLite INTEGER values.
- * </p>
+ * Converts Java {@link Date} values to SQLite INTEGER values.
  */
 public class UtilDateAdapter extends TypeAdapter<Date, Long> {
 
@@ -36,7 +34,7 @@ public class UtilDateAdapter extends TypeAdapter<Date, Long> {
      * @return {@inheritDoc}
      */
     @Override
-    public Long serialize(Date value) {
+    public Long serialize(final Date value) {
         if (value != null) {
             return value.getTime();
         }
@@ -51,7 +49,7 @@ public class UtilDateAdapter extends TypeAdapter<Date, Long> {
      * @return {@inheritDoc}
      */
     @Override
-    public Date deserialize(Long value) {
+    public Date deserialize(final Long value) {
         if (value != null) {
             return new Date(value);
         }

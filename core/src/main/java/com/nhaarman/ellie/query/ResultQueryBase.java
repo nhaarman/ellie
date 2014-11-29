@@ -21,7 +21,11 @@ import android.database.Cursor;
 
 import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.Model;
+import com.nhaarman.ellie.ModelRepository;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -40,7 +44,7 @@ public abstract class ResultQueryBase extends ExecutableQueryBase implements Res
     }
 
     public static <T extends Model> List<T> rawQuery(final Ellie ellie, final Class<T> cls, final String sql, final String[] selectionArgs) {
-        return ellie.processAndCloseCursor(cls, ellie.getDatabase().rawQuery(sql, selectionArgs));
+        return processAndCloseCursor(ellie, cls, ellie.getDatabase().rawQuery(sql, selectionArgs));
     }
 
     public ResultQueryBase with(final Ellie ellie) {
@@ -107,6 +111,57 @@ public abstract class ResultQueryBase extends ExecutableQueryBase implements Res
     @Override
     public <T> Observable<T> observableValue(final Class<T> type) {
         return Observable.create(new ValueOnSubscribe<>(type));
+    }
+
+    /**
+     * Iterate over a cursor and load entities. Closes the cursor when finished.
+     *
+     * @param <T>    The Model type
+     * @param ellie  The {@link Ellie} instance to use.
+     * @param cls    The model class.
+     * @param cursor The result cursor.
+     *
+     * @return The list of entities.
+     */
+    private static <T extends Model> List<T> processAndCloseCursor(final Ellie ellie, final Class<T> cls, final Cursor cursor) {
+        List<T> entities = processCursor(ellie, cls, cursor);
+        cursor.close();
+        return entities;
+    }
+
+    /**
+     * Iterate over a cursor and load entities.
+     *
+     * @param <T>    The Model type
+     * @param ellie  The {@link Ellie} instance to use.
+     * @param cls    The Model class.
+     * @param cursor The result cursor.
+     *
+     * @return The list of entities.
+     */
+    private static <T extends Model> List<T> processCursor(final Ellie ellie, final Class<T> cls, final Cursor cursor) {
+        final List<T> entities = new ArrayList<>();
+        ModelRepository<T> modelRepository = ellie.getModelRepository(cls);
+
+        try {
+            Constructor<T> entityConstructor = cls.getConstructor();
+            if (cursor.moveToFirst()) {
+                do {
+                    T entity = modelRepository.getEntity(cursor.getLong(cursor.getColumnIndex(Model.COLUMN_ID)));
+                    if (entity == null) {
+                        entity = entityConstructor.newInstance();
+                    }
+
+                    entity.load(cursor);
+                    entities.add(entity);
+                }
+                while (cursor.moveToNext());
+            }
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+
+        return entities;
     }
 
     private class ListOnSubscribe<T extends Model> implements OnSubscribe<List<T>> {

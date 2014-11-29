@@ -24,10 +24,8 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
- * <p>
  * An annotation that indicates a member should define its SQLite column using the PRIMARY KEY constraint. Must be
  * used in conjunction with {@link Column}.
- * </p>
  * <p>
  * <a href="http://www.sqlite.org/lang_createtable.html#primkeyconst">
  * http://www.sqlite.org/lang_createtable.html#primkeyconst

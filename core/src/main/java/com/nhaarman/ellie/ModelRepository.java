@@ -19,6 +19,9 @@ package com.nhaarman.ellie;
 
 import android.database.Cursor;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * An interface to perform database operations for a Model.
  *
@@ -32,12 +35,16 @@ public interface ModelRepository<T extends Model> {
 
     /* Model operations */
 
+    @Nullable
     T find(long id);
 
+    @NotNull
     Long create(T entity);
 
+    @NotNull
     Long update(T entity);
 
+    @NotNull
     Long createOrUpdate(T entity);
 
     void delete(T entity);

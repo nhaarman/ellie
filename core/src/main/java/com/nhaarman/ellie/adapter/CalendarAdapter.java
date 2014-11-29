@@ -23,7 +23,7 @@ import java.util.Calendar;
 
 /**
  * <p>
- * Converts Java {@link java.util.Calendar} values to SQLite INTEGER values.
+ * Converts Java {@link Calendar} values to SQLite INTEGER values.
  * </p>
  */
 public class CalendarAdapter extends TypeAdapter<Calendar, Long> {
@@ -36,7 +36,7 @@ public class CalendarAdapter extends TypeAdapter<Calendar, Long> {
      * @return {@inheritDoc}
      */
     @Override
-    public Long serialize(Calendar value) {
+    public Long serialize(final Calendar value) {
         if (value != null) {
             return value.getTimeInMillis();
         }
@@ -51,7 +51,7 @@ public class CalendarAdapter extends TypeAdapter<Calendar, Long> {
      * @return {@inheritDoc}
      */
     @Override
-    public Calendar deserialize(Long value) {
+    public Calendar deserialize(final Long value) {
         if (value != null) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(value);

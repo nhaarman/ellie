@@ -17,10 +17,12 @@
 
 package com.nhaarman.ellie.internal.codegen.step;
 
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.TypeElement;
 import java.util.Set;
 
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+
 public interface ProcessingStep {
-	boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv);
+
+    void process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv);
 }

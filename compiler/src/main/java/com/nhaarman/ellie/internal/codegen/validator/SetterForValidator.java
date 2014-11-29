@@ -33,36 +33,36 @@ import static javax.tools.Diagnostic.Kind.ERROR;
 
 public class SetterForValidator implements Validator {
 
-	private Registry mRegistry;
-	private Messager mMessager;
+    private final Registry mRegistry;
+    private final Messager mMessager;
 
-	public SetterForValidator(Registry registry) {
-		this.mRegistry = registry;
-		this.mMessager = registry.getMessager();
-	}
+    public SetterForValidator(final Registry registry) {
+        mRegistry = registry;
+        mMessager = registry.getMessager();
+    }
 
-	@Override
-	public boolean validate(Element enclosingElement, Element element) {
-		Table table = enclosingElement.getAnnotation(Table.class);
-		if (!enclosingElement.getKind().equals(CLASS) || table == null) {
-			mMessager.printMessage(ERROR, "@SetterFor methods can only be enclosed by model classes.", element);
-			return false;
-		}
+    @Override
+    public boolean validate(final Element enclosingElement, final Element element) {
+        Table table = enclosingElement.getAnnotation(Table.class);
+        if (enclosingElement.getKind() != CLASS || table == null) {
+            mMessager.printMessage(ERROR, "@SetterFor methods can only be enclosed by model classes.", element);
+            return false;
+        }
 
-		SetterFor setter = element.getAnnotation(SetterFor.class);
-		Set<ColumnElement> existingColumns = mRegistry.getColumnElements((TypeElement) enclosingElement);
+        SetterFor setter = element.getAnnotation(SetterFor.class);
+        Set<ColumnElement> existingColumns = mRegistry.getColumnElements((TypeElement) enclosingElement);
 
-		boolean hasField = false;
-		for (ColumnElement column : existingColumns) {
-			if (column.getColumnName().equals(setter.value())) {
-				hasField = true;
-			}
-		}
+        boolean hasField = false;
+        for (ColumnElement column : existingColumns) {
+            if (column.getColumnName().equals(setter.value())) {
+                hasField = true;
+            }
+        }
 
-		if(!hasField){
-			mMessager.printMessage(ERROR, "@SetterFor \"" + setter.value() + "\" found without a @Column annotated field for \"" + setter.value() + "\".", element);
-		}
+        if (!hasField) {
+            mMessager.printMessage(ERROR, "@SetterFor \"" + setter.value() + "\" found without a @Column annotated field for \"" + setter.value() + "\".", element);
+        }
 
-		return true;
-	}
+        return true;
+    }
 }

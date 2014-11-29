@@ -15,21 +15,37 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.test.model.migration;
+package com.nhaarman.ellie;
 
+import org.jetbrains.annotations.NotNull;
 
-import com.nhaarman.ellie.Migration;
+public abstract class BaseMigration {
 
-public class AddDateColumnMigration extends Migration {
-	@Override
-	public int getVersion() {
-		return 2;
-	}
+    public void beforeUp() {
+    }
 
-	@Override
-	public String[] getStatements() {
-		return new String[]{
-				"ALTER TABLE notes ADD COLUMN date INTEGER"
-		};
-	}
+    /**
+     * Returns the SQL statements which are to be executed in order to perform this migration.
+     *
+     * @return The SQL statements.
+     */
+    @NotNull
+    public String[] getUpStatements() {
+        return new String[0];
+    }
+
+    public void afterUp() {
+    }
+
+    public void beforeDown() {
+    }
+
+    @NotNull
+    public String[] getDownStatements() {
+        return new String[0];
+    }
+
+    public void afterDown() {
+    }
+
 }

@@ -18,6 +18,7 @@
 package com.nhaarman.ellie.internal.codegen;
 
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
@@ -27,6 +28,11 @@ import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
 import com.nhaarman.ellie.internal.codegen.element.ModelRepositoryElement;
 import com.nhaarman.ellie.internal.codegen.element.TypeAdapterElement;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +52,6 @@ public class Registry {
 
     private final Filer mFiler;
 
-    private final Set<MigrationElement> mMigrationElements = Sets.newHashSet();
 
     private final Map<String, TypeAdapterElement> mTypeAdapters = Maps.newHashMap();
 
@@ -55,6 +60,8 @@ public class Registry {
     private final Set<ModelAdapterElement> mModelAdapters = Sets.newHashSet();
 
     private final Set<ModelRepositoryElement> mModelRepositories = Sets.newHashSet();
+
+    private final Map<Integer, MigrationElement> mMigrationElements = Maps.newHashMap();
 
     public Registry(final Messager messager, final Types types, final Elements elements, final Filer filer) {
         mMessager = messager;
@@ -81,12 +88,16 @@ public class Registry {
 
     // Migrations
 
-    public Set<MigrationElement> getMigrationElements() {
+    public Map<Integer, MigrationElement> getMigrationElements() {
         return mMigrationElements;
     }
 
+    public MigrationElement getMigrationElement(final int version) {
+        return mMigrationElements.get(version);
+    }
+
     public void addMigrationElement(final MigrationElement element) {
-        mMigrationElements.add(element);
+        mMigrationElements.put(element.getVersion(), element);
     }
 
     // Type adapters
@@ -95,8 +106,18 @@ public class Registry {
         return mTypeAdapters.get(deserializedType.getQualifiedName().toString());
     }
 
-    public Set<TypeAdapterElement> getTypeAdapterElements() {
-        return Sets.newHashSet(mTypeAdapters.values());
+    public List<TypeAdapterElement> getTypeAdapterElements() {
+        Collection<TypeAdapterElement> values = mTypeAdapters.values();
+        List<TypeAdapterElement> result = Lists.newArrayList(values);
+        Collections.sort(
+                result, new Comparator<TypeAdapterElement>() {
+                    @Override
+                    public int compare(final TypeAdapterElement o1, final TypeAdapterElement o2) {
+                        return o1.getSimpleName().compareTo(o2.getSimpleName());
+                    }
+                }
+        );
+        return result;
     }
 
     public void addTypeAdapterModel(final TypeAdapterElement element) {
@@ -115,8 +136,19 @@ public class Registry {
 
     // Model adapters
 
-    public Set<ModelAdapterElement> getModelAdapterElements() {
-        return mModelAdapters;
+    public List<ModelAdapterElement> getModelAdapterElements() {
+        List<ModelAdapterElement> result = new ArrayList<>(mModelAdapters);
+
+        Collections.sort(
+                result, new Comparator<ModelAdapterElement>() {
+                    @Override
+                    public int compare(final ModelAdapterElement o1, final ModelAdapterElement o2) {
+                        return o1.getQualifiedName().compareTo(o2.getQualifiedName());
+                    }
+                }
+        );
+
+        return result;
     }
 
     public void addModelAdapterElement(final ModelAdapterElement element) {

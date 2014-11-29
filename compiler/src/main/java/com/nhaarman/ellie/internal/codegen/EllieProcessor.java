@@ -20,9 +20,9 @@ package com.nhaarman.ellie.internal.codegen;
 import com.google.common.collect.ImmutableSet;
 import com.nhaarman.ellie.annotation.Column;
 import com.nhaarman.ellie.annotation.GetterFor;
+import com.nhaarman.ellie.annotation.Migration;
 import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
-import com.nhaarman.ellie.internal.Migration;
 import com.nhaarman.ellie.internal.TypeAdapter;
 import com.nhaarman.ellie.internal.codegen.step.AdapterHolderStep;
 import com.nhaarman.ellie.internal.codegen.step.ColumnStep;
@@ -63,7 +63,7 @@ public class EllieProcessor extends AbstractProcessor {
     }
 
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnv) {
+    public synchronized void init(final ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
 
         Registry registry = new Registry(
@@ -85,7 +85,7 @@ public class EllieProcessor extends AbstractProcessor {
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+    public synchronized boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
         for (ProcessingStep processingStep : mProcessingSteps) {
             processingStep.process(annotations, roundEnv);
         }
