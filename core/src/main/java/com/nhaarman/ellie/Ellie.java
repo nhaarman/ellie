@@ -85,7 +85,7 @@ public final class Ellie {
     }
 
     /**
-     * The {@link AdapterHolder} instance that is instantiated to access the {@link ModelAdapter}s, {@link TypeAdapter}s, and {@link Migration}s.
+     * The {@link AdapterHolder} instance that is instantiated to access the {@link ModelAdapter}s, {@link TypeAdapter}s, and {@link BaseMigration}s.
      * This value is {@code null} until {@link #init(Context, String, int, int, LogLevel)} is successfully called.
      */
     @Nullable

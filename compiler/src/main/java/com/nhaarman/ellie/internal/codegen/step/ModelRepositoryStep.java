@@ -60,7 +60,7 @@ public class ModelRepositoryStep implements ProcessingStep {
     }
 
     @Override
-    public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+    public void process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
         Set<? extends Element> tableElements = roundEnv.getElementsAnnotatedWith(Table.class);
         for (Element tableElement : tableElements) {
             if (mModelRepositoryValidator.validate(tableElement.getEnclosingElement(), tableElement)) {
@@ -78,6 +78,5 @@ public class ModelRepositoryStep implements ProcessingStep {
                 }
             }
         }
-        return false;
     }
 }

@@ -19,20 +19,10 @@ package com.nhaarman.ellie;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * Migrations execute SQL statements when upgrading from one database version to another. Migrations are sorted by
- * version number and executed in that order using migrations with versions higher than the current database version
- * number, and excluding all those with version numbers at or below the current database version number.
- */
-@com.nhaarman.ellie.internal.Migration
-public abstract class Migration implements Comparable<Migration> {
+public abstract class BaseMigration {
 
-    /**
-     * Returns the database version for which to apply this migration.
-     *
-     * @return The database version.
-     */
-    public abstract int getVersion();
+    public void beforeUp() {
+    }
 
     /**
      * Returns the SQL statements which are to be executed in order to perform this migration.
@@ -40,10 +30,22 @@ public abstract class Migration implements Comparable<Migration> {
      * @return The SQL statements.
      */
     @NotNull
-    public abstract String[] getStatements();
-
-    @Override
-    public int compareTo(@NotNull final Migration migration) {
-        return Integer.compare(getVersion(), migration.getVersion());
+    public String[] getUpStatements() {
+        return new String[0];
     }
+
+    public void afterUp() {
+    }
+
+    public void beforeDown() {
+    }
+
+    @NotNull
+    public String[] getDownStatements() {
+        return new String[0];
+    }
+
+    public void afterDown() {
+    }
+
 }

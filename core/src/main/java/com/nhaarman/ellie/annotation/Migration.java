@@ -15,14 +15,28 @@
  * limitations under the License.
  */
 
-package com.nhaarman.ellie.test.model.migration;
+package com.nhaarman.ellie.annotation;
 
-import com.nhaarman.ellie.annotation.Column;
-import com.nhaarman.ellie.annotation.Table;
-import com.nhaarman.ellie.test.model.Note;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-@Table("extended_notes")
-public class ExtendedNote extends Note {
-	@Column("extendedBody")
-	public String extendedBody;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+
+/**
+ * Used to specify that a class serves as a migration class for migrating the database between versions.
+ */
+@Inherited
+@Target(TYPE)
+@Retention(CLASS)
+public @interface Migration {
+
+    /**
+     * The version the database has after the migration has run.
+     *
+     * @return The version.
+     */
+    int version();
+
 }

@@ -34,4 +34,12 @@ public class ModelAdapterElement {
     public String getModelQualifiedName() {
         return mElement.getQualifiedName().toString();
     }
+
+    public String getModelSimpleName() {
+        return mElement.getSimpleName().toString();
+    }
+
+    public String getSimpleName() {
+        return getModelSimpleName() + "$$ModelAdapter";
+    }
 }

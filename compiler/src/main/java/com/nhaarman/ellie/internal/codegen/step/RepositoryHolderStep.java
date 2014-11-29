@@ -41,7 +41,7 @@ public class RepositoryHolderStep implements ProcessingStep {
     }
 
     @Override
-    public boolean process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+    public void process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
             try {
                 String name = mSourceWriter.createSourceName(null);
@@ -54,7 +54,5 @@ public class RepositoryHolderStep implements ProcessingStep {
                 e.printStackTrace();
             }
         }
-
-        return false;
     }
 }

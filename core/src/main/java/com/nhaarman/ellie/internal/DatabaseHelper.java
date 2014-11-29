@@ -28,7 +28,9 @@ import android.database.sqlite.SQLiteQuery;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.util.Log;
+import android.util.SparseArray;
 
+import com.nhaarman.ellie.BaseMigration;
 import com.nhaarman.ellie.Ellie.LogLevel;
 import com.nhaarman.ellie.Model;
 
@@ -48,7 +50,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @NotNull
     private final AdapterHolder mAdapterHolder;
 
-    DatabaseHelper(@NotNull final Context context, @NotNull final String name, final int version, @NotNull final AdapterHolder adapterHolder, @NotNull final LogLevel logLevel) {
+    public DatabaseHelper(@NotNull final Context context, @NotNull final String name, final int version,
+                          @NotNull final AdapterHolder adapterHolder, @NotNull final LogLevel logLevel) {
         super(context, name, logLevel.log(LogLevel.FULL) ? new LoggingCursorAdapter() : null, version);
         mAdapterHolder = adapterHolder;
     }
@@ -62,14 +65,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(@NotNull final SQLiteDatabase sqLiteDatabase) {
         executePragmas(sqLiteDatabase);
         executeCreate(sqLiteDatabase);
-        executeMigrations(sqLiteDatabase, -1, sqLiteDatabase.getVersion());
+        executeUpMigrations(sqLiteDatabase, -1, sqLiteDatabase.getVersion());
     }
 
     @Override
     public void onUpgrade(@NotNull final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
         executePragmas(sqLiteDatabase);
         executeCreate(sqLiteDatabase);
-        executeMigrations(sqLiteDatabase, oldVersion, newVersion);
+        executeUpMigrations(sqLiteDatabase, oldVersion, newVersion);
+    }
+
+    @Override
+    public void onDowngrade(final SQLiteDatabase sqLiteDatabase, final int oldVersion, final int newVersion) {
+        executePragmas(sqLiteDatabase);
+        executeDownMigrations(sqLiteDatabase, oldVersion, newVersion);
     }
 
     /**
@@ -106,34 +115,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Executes the migrations for given versions.
+     * Executes the up migrations for given versions.
      *
      * @param db         The {@link SQLiteDatabase}.
      * @param oldVersion The old version of the database.
      * @param newVersion The new version of the database.
-     *
-     * @return true if a migration was executed.
      */
-    private boolean executeMigrations(@NotNull final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        boolean migrationExecuted = false;
-        final List<? extends com.nhaarman.ellie.Migration> migrations = mAdapterHolder.getMigrations();
+    private void executeUpMigrations(@NotNull final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+        SparseArray<? extends BaseMigration> migrations = mAdapterHolder.getMigrations();
 
         db.beginTransaction();
         try {
-            for (com.nhaarman.ellie.Migration migration : migrations) {
-                if (migration.getVersion() > oldVersion && migration.getVersion() <= newVersion) {
-                    for (String statement : migration.getStatements()) {
+            for (int version = oldVersion + 1; version <= newVersion; version++) {
+                BaseMigration baseMigration = migrations.get(version);
+                if (baseMigration != null) {
+                    baseMigration.beforeUp();
+                    for (String statement : baseMigration.getUpStatements()) {
                         db.execSQL(statement);
                     }
-                    migrationExecuted = true;
+                    baseMigration.afterUp();
                 }
             }
-        } finally {
             db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
         }
-        db.endTransaction();
+    }
 
-        return migrationExecuted;
+    /**
+     * Executes the down migrations for given versions.
+     *
+     * @param db         The {@link SQLiteDatabase}.
+     * @param oldVersion The old version of the database.
+     * @param newVersion The new version of the database.
+     */
+    private void executeDownMigrations(@NotNull final SQLiteDatabase db, final int oldVersion, final int newVersion) {
+        SparseArray<? extends BaseMigration> migrations = mAdapterHolder.getMigrations();
+
+        db.beginTransaction();
+        try {
+            for (int version = oldVersion; version > newVersion; version--) {
+                BaseMigration baseMigration = migrations.get(version);
+                if (baseMigration != null) {
+                    baseMigration.beforeDown();
+                    for (String statement : baseMigration.getDownStatements()) {
+                        db.execSQL(statement);
+                    }
+                    baseMigration.afterDown();
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     private static class LoggingCursorAdapter implements CursorFactory {

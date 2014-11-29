@@ -18,5 +18,6 @@
 package com.nhaarman.ellie.internal.codegen;
 
 public class Errors {
-	public static final String COLUMN_DUPLICATE_ERROR = "@Column with name already exists: ";
+
+    public static final String COLUMN_DUPLICATE_ERROR = "@Column with name already exists: ";
 }

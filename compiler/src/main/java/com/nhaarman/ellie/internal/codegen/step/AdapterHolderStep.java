@@ -21,37 +21,37 @@ import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.writer.AdapterHolderWriter;
 import com.nhaarman.ellie.internal.codegen.writer.SourceWriter;
 
-import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.TypeElement;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.element.TypeElement;
+import javax.tools.JavaFileObject;
+
 public class AdapterHolderStep implements ProcessingStep {
-	private Registry registry;
-	private SourceWriter sourceWriter;
 
-	public AdapterHolderStep(Registry registry) {
-		this.registry = registry;
-		this.sourceWriter = new AdapterHolderWriter(registry);
-	}
+    private final Registry mRegistry;
+    private final SourceWriter mSourceWriter;
 
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		if (roundEnv.processingOver()) {
-			try {
-				String name = sourceWriter.createSourceName(null);
-				JavaFileObject object = registry.getFiler().createSourceFile(name);
-				Writer writer = object.openWriter();
-				sourceWriter.writeSource(writer, null);
-				writer.flush();
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+    public AdapterHolderStep(final Registry registry) {
+        mRegistry = registry;
+        mSourceWriter = new AdapterHolderWriter(registry);
+    }
 
-		return false;
-	}
+    @Override
+    public void process(final Set<? extends TypeElement> annotations, final RoundEnvironment roundEnv) {
+        if (roundEnv.processingOver()) {
+            try {
+                String name = mSourceWriter.createSourceName(null);
+                JavaFileObject object = mRegistry.getFiler().createSourceFile(name);
+                Writer writer = object.openWriter();
+                mSourceWriter.writeSource(writer, null);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

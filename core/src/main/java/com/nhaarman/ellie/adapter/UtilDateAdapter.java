@@ -22,9 +22,7 @@ import com.nhaarman.ellie.TypeAdapter;
 import java.util.Date;
 
 /**
- * <p>
  * Converts Java {@link Date} values to SQLite INTEGER values.
- * </p>
  */
 public class UtilDateAdapter extends TypeAdapter<Date, Long> {
 

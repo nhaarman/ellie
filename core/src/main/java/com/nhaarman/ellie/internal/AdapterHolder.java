@@ -17,7 +17,9 @@
 
 package com.nhaarman.ellie.internal;
 
-import com.nhaarman.ellie.Migration;
+import android.util.SparseArray;
+
+import com.nhaarman.ellie.BaseMigration;
 import com.nhaarman.ellie.Model;
 import com.nhaarman.ellie.TypeAdapter;
 
@@ -29,7 +31,7 @@ import java.util.List;
 import static com.nhaarman.ellie.internal.Package.PACKAGE_NAME;
 
 /**
- * Used internally to instantiate the {@link ModelAdapter}s, {@link TypeAdapter}s and {@link Migration}s.
+ * Used internally to instantiate the {@link ModelAdapter}s, {@link TypeAdapter}s and {@link BaseMigration}s.
  * <p/>
  * The compiler generates the one and only subclass of this interface; users should normally not subclass this.
  * The class should be instantiated by reflection, where the fully qualified name is {@link #IMPL_CLASS_FQCN},
@@ -53,12 +55,13 @@ public interface AdapterHolder {
     Class<?>[] CONSTRUCTOR_CLASSES = {};
 
     /**
-     * Returns a sorted, ascending list of {@link Migration}s.
+     * Returns a {@link SparseArray< BaseMigration >} of {@link BaseMigration}s,
+     * where the keys are the version numbers of the {@code Migration}s.
      *
-     * @return The list of {@code Migration}s.
+     * @return The {@link BaseMigration}s.
      */
     @NotNull
-    List<? extends Migration> getMigrations();
+    SparseArray<? extends BaseMigration> getMigrations();
 
     /**
      * Returns the {@link ModelAdapter} instance for given type, if it exists.

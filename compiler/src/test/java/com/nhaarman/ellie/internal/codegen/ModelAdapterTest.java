@@ -33,29 +33,27 @@ public class ModelAdapterTest {
 
     @Test
     public void modelAdapter() {
-        JavaFileObject source = JavaFileObjects.forSourceString(
+        JavaFileObject source = JavaFileObjects.forSourceLines(
                 "com.nhaarman.ellie.test.Note",
-                Joiner.on('\n').join(
-                        "package com.nhaarman.ellie.test;",
-                        "import java.util.Date;",
-                        "import com.nhaarman.ellie.Model;",
-                        "import com.nhaarman.ellie.annotation.Column;",
-                        "import com.nhaarman.ellie.annotation.GetterFor;",
-                        "import com.nhaarman.ellie.annotation.SetterFor;",
-                        "import com.nhaarman.ellie.annotation.NotNull;",
-                        "import com.nhaarman.ellie.annotation.Table;",
-                        "@Table(\"notes\")",
-                        "public class Note extends Model {",
-                        "	public static final String TITLE = \"title\";",
-                        "	public static final String BODY = \"body\";",
-                        "	public static final String DATE = \"date\";",
-                        "	@Column(TITLE) public String title;",
-                        "	@Column(BODY) @NotNull public String body;",
-                        "	@Column(DATE) public Date date;",
-                        "   @GetterFor(TITLE) public String getTitle() { return title; }",
-                        "   @SetterFor(TITLE) public void setTitle(String title) { this.title = title; }",
-                        "}"
-                )
+                "package com.nhaarman.ellie.test;",
+                "import java.util.Date;",
+                "import com.nhaarman.ellie.Model;",
+                "import com.nhaarman.ellie.annotation.Column;",
+                "import com.nhaarman.ellie.annotation.GetterFor;",
+                "import com.nhaarman.ellie.annotation.SetterFor;",
+                "import com.nhaarman.ellie.annotation.NotNull;",
+                "import com.nhaarman.ellie.annotation.Table;",
+                "@Table(\"notes\")",
+                "public class Note extends Model {",
+                "	public static final String TITLE = \"title\";",
+                "	public static final String BODY = \"body\";",
+                "	public static final String DATE = \"date\";",
+                "	@Column(TITLE) public String title;",
+                "	@Column(BODY) @NotNull public String body;",
+                "	@Column(DATE) public Date date;",
+                "   @GetterFor(TITLE) public String getTitle() { return title; }",
+                "   @SetterFor(TITLE) public void setTitle(String title) { this.title = title; }",
+                "}"
         );
 
         JavaFileObject expectedSource = JavaFileObjects.forSourceString(
@@ -95,25 +93,23 @@ public class ModelAdapterTest {
 
     @Test
     public void tablesAreClasses() {
-        JavaFileObject source = JavaFileObjects.forSourceString(
+        JavaFileObject source = JavaFileObjects.forSourceLines(
                 "com.nhaarman.ellie.test.Note",
-                Joiner.on('\n').join(
-                        "package com.nhaarman.ellie.test;",
-                        "import java.util.Date;",
-                        "import com.nhaarman.ellie.Model;",
-                        "import com.nhaarman.ellie.annotation.Column;",
-                        "import com.nhaarman.ellie.annotation.NotNull;",
-                        "import com.nhaarman.ellie.annotation.Table;",
-                        "@Table(\"notes\")",
-                        "public class Note extends Model {",
-                        "	public static final String TITLE = \"title\";",
-                        "	public static final String BODY = \"body\";",
-                        "	public static final String DATE = \"date\";",
-                        "	@Table(TITLE) public String title;",
-                        "	@Table(BODY) @NotNull public String body;",
-                        "	@Table(DATE) public Date date;",
-                        "}"
-                )
+                "package com.nhaarman.ellie.test;",
+                "import java.util.Date;",
+                "import com.nhaarman.ellie.Model;",
+                "import com.nhaarman.ellie.annotation.Column;",
+                "import com.nhaarman.ellie.annotation.NotNull;",
+                "import com.nhaarman.ellie.annotation.Table;",
+                "@Table(\"notes\")",
+                "public class Note extends Model {",
+                "	public static final String TITLE = \"title\";",
+                "	public static final String BODY = \"body\";",
+                "	public static final String DATE = \"date\";",
+                "	@Table(TITLE) public String title;",
+                "	@Table(BODY) @NotNull public String body;",
+                "	@Table(DATE) public Date date;",
+                "}"
         );
 
         ASSERT.about(javaSource()).that(source)

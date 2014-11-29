@@ -17,8 +17,8 @@
 
 package com.nhaarman.ellie.test.content;
 
-        import com.nhaarman.ellie.Ellie;
-        import com.nhaarman.ellie.EllieProvider;
+import com.nhaarman.ellie.Ellie;
+import com.nhaarman.ellie.EllieProvider;
 
 
 public class EllieSampleProvider extends EllieProvider {

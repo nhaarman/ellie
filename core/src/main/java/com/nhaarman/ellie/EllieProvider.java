@@ -47,7 +47,8 @@ import com.nhaarman.ellie.internal.ModelAdapter;
         "HardCodedStringLiteral"
         , "rawtypes"
         , "ParameterNameDiffersFromOverriddenParameter"
-}) public abstract class EllieProvider extends ContentProvider {
+})
+public abstract class EllieProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
 
