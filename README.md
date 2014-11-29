@@ -4,6 +4,8 @@ Ellie
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nhaarman/ellie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+[![In Progress](https://badge.waffle.io/nhaarman/ellie.svg?label=in-progress&title=In Progress)](http://waffle.io/nhaarman/ellie)
+
 Compile-time active record ORM for Android.
 
 Ellie is a heavily modified fork from [Ollie](https://github.com/pardom/ollie), with a few important modifications:
