@@ -24,7 +24,6 @@ import javax.tools.JavaFileObject;
 public class Note {
 
     public static JavaFileObject fullSource() {
-
         return JavaFileObjects.forSourceLines(
                 "com.nhaarman.ellie.Note",
                 "package com.nhaarman.ellie;",

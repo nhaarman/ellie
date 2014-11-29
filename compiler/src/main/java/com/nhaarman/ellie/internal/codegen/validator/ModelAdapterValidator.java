@@ -36,7 +36,7 @@ public class ModelAdapterValidator implements Validator {
     @Override
     public boolean validate(final Element enclosingElement, final Element element) {
         if (element.getKind() != CLASS) {
-            mMessager.printMessage(ERROR, "@Table applies only to Model classes.", element);
+            mMessager.printMessage(ERROR, "annotation type not applicable to this kind of declaration", element);
             return false;
         }
 

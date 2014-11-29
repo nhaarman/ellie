@@ -25,7 +25,7 @@ import com.nhaarman.ellie.BaseMigration;
 import com.nhaarman.ellie.internal.ModelAdapter;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.MigrationElement;
-import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
+import com.nhaarman.ellie.internal.codegen.element.ModelElement;
 import com.nhaarman.ellie.internal.codegen.element.TypeAdapterElement;
 import com.squareup.javawriter.JavaWriter;
 
@@ -112,10 +112,10 @@ public class AdapterHolderWriter implements SourceWriter<TypeElement> {
             imports.add(migrationElement.getQualifiedName());
         }
 
-        List<ModelAdapterElement> modelAdapterElements = mRegistry.getModelAdapterElements();
-        for (ModelAdapterElement modelAdapterElement : modelAdapterElements) {
-            imports.add(modelAdapterElement.getModelQualifiedName());
-            imports.add(modelAdapterElement.getQualifiedName());
+        List<ModelElement> modelElements = mRegistry.getModelElements();
+        for (ModelElement modelElement : modelElements) {
+            imports.add(modelElement.getModelQualifiedName());
+            imports.add(modelElement.getModelAdapterQualifiedName());
         }
 
         writer.emitImports(imports);
@@ -172,7 +172,7 @@ public class AdapterHolderWriter implements SourceWriter<TypeElement> {
     private void writeCreateModelAdapters(final JavaWriter writer) throws IOException {
         writer.beginMethod(void.class.getSimpleName(), "createModelAdapters", PRIVATE);
 
-        for (ModelAdapterElement modelAdapter : mRegistry.getModelAdapterElements()) {
+        for (ModelElement modelAdapter : mRegistry.getModelElements()) {
             writer.emitStatement(
                     "mModelAdapters.put(%s.class, new %s())",
                     modelAdapter.getModelSimpleName(),
