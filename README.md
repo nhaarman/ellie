@@ -1,5 +1,7 @@
 Ellie
 =====
+[![Build Status](https://travis-ci.org/nhaarman/ellie.svg?branch=0.0.3)](https://travis-ci.org/nhaarman/ellie)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nhaarman/ellie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Compile-time active record ORM for Android.
