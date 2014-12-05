@@ -1,6 +1,6 @@
 Ellie
 =====
-[![Build Status](https://travis-ci.org/nhaarman/ellie.svg?branch=0.0.3)](https://travis-ci.org/nhaarman/ellie)
+[![Build Status](https://travis-ci.org/nhaarman/ellie.svg?branch=master)](https://travis-ci.org/nhaarman/ellie)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.nhaarman.ellie/core)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/nhaarman/ellie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -20,12 +20,12 @@ Grab via Maven:
 <dependency>
   <groupId>com.nhaarman.ellie</groupId>
   <artifactId>core</artifactId>
-  <version>0.0.3</version>
+  <version>x.x.x</version>
 </dependency>
 <dependency>
   <groupId>com.nhaarman.ellie</groupId>
   <artifactId>compiler</artifactId>
-  <version>0.0.3</version>
+  <version>x.x.x</version>
   <optional>true</optional>
 </dependency>
 ```
@@ -33,8 +33,8 @@ Grab via Maven:
 or Gradle:
 
 ```groovy
-compile 'com.nhaarman.ellie:core:0.0.3'
-provided 'com.nhaarman.ellie:compiler:0.0.3'
+compile 'com.nhaarman.ellie:core:x.x.x'
+provided 'com.nhaarman.ellie:compiler:x.x.x'
 ```
 
 Build
