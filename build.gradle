@@ -14,3 +14,8 @@ allprojects {
 		options.addStringOption('Xdoclint:none', '-quiet')
 	}
 }
+
+subprojects {
+	project.group = GROUP
+	project.version = VERSION_NAME
+}
