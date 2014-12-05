@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2014 Michael Pardo
  * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +49,7 @@ public class MigrationValidator {
         }
 
         if (!((TypeElement) element).getSuperclass().toString().equals(BaseMigration.class.getName())) {
-            mMessager.printMessage(ERROR, "Classes annotated with @Migration should extend BaseMigration.");
+            mMessager.printMessage(ERROR, "Classes annotated with @Migration should extend BaseMigration.", element);
             return false;
         }
 

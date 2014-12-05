@@ -23,7 +23,7 @@ import javax.tools.JavaFileObject;
 
 public class Migration {
 
-    public static JavaFileObject fullMigration(final String name, int version) {
+    public static JavaFileObject fullMigration(final String name, final int version) {
         return JavaFileObjects.forSourceLines(
                 "com.nhaarman.test." + name,
                 "package com.nhaarman.ellie;",

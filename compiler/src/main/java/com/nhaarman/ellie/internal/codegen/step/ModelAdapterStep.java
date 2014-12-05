@@ -23,7 +23,7 @@ import com.nhaarman.ellie.annotation.SetterFor;
 import com.nhaarman.ellie.annotation.Table;
 import com.nhaarman.ellie.internal.codegen.Registry;
 import com.nhaarman.ellie.internal.codegen.element.ColumnElement;
-import com.nhaarman.ellie.internal.codegen.element.ModelAdapterElement;
+import com.nhaarman.ellie.internal.codegen.element.ModelElement;
 import com.nhaarman.ellie.internal.codegen.validator.ColumnValidator;
 import com.nhaarman.ellie.internal.codegen.validator.GetterForValidator;
 import com.nhaarman.ellie.internal.codegen.validator.ModelAdapterValidator;
@@ -73,7 +73,7 @@ public class ModelAdapterStep implements ProcessingStep {
         Set<? extends Element> tableElements = roundEnv.getElementsAnnotatedWith(Table.class);
         for (Element tableElement : tableElements) {
             if (mModelAdapterValidator.validate(tableElement.getEnclosingElement(), tableElement)) {
-                mRegistry.addModelAdapterElement(new ModelAdapterElement((TypeElement) tableElement));
+                mRegistry.addModelElement(new ModelElement((TypeElement) tableElement));
 
                 addColumnElements((TypeElement) tableElement);
                 addAccessors((TypeElement) tableElement);

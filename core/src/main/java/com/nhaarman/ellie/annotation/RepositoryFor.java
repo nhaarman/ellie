@@ -16,7 +16,9 @@
 
 package com.nhaarman.ellie.annotation;
 
-import java.lang.annotation.Inherited;
+import com.nhaarman.ellie.Model;
+import com.nhaarman.ellie.ModelRepository;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -24,18 +26,16 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.CLASS;
 
 /**
- * Used to specify that a class serves as a migration class for migrating the database between versions.
+ * An annotation that indicates the annotated class should be the superclass for the generated {@link ModelRepository} for given {@link Model}.
  */
-@Inherited
 @Target(TYPE)
 @Retention(CLASS)
-public @interface Migration {
+public @interface RepositoryFor {
 
     /**
-     * The version the database has after the migration has run.
+     * The {@link Model} class the annotated class is a repository for.
      *
-     * @return The version.
+     * @return The {@code Model} class.
      */
-    int version();
-
+    Class<? extends Model> value();
 }

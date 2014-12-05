@@ -45,7 +45,7 @@ public class SetterForValidator implements Validator {
     public boolean validate(final Element enclosingElement, final Element element) {
         Table table = enclosingElement.getAnnotation(Table.class);
         if (enclosingElement.getKind() != CLASS || table == null) {
-            mMessager.printMessage(ERROR, "@SetterFor methods can only be enclosed by model classes.", element);
+            mMessager.printMessage(ERROR, "annotation type not applicable to this kind of declaration", element);
             return false;
         }
 

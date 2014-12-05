@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2014 Michael Pardo
  * Copyright (C) 2014 Niek Haarman
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +23,7 @@ import com.nhaarman.ellie.Ellie;
 import com.nhaarman.ellie.ModelRepository;
 import com.nhaarman.ellie.internal.RepositoryHolder;
 import com.nhaarman.ellie.internal.codegen.Registry;
-import com.nhaarman.ellie.internal.codegen.element.ModelRepositoryElement;
+import com.nhaarman.ellie.internal.codegen.element.ModelElement;
 import com.squareup.javawriter.JavaWriter;
 
 import java.io.IOException;
@@ -137,11 +136,11 @@ public class RepositoryHolderWriter implements SourceWriter<TypeElement> {
                 "final int", "cacheSize"
         );
 
-        for (ModelRepositoryElement modelRepositoryElement : mRegistry.getModelRepositories()) {
+        for (ModelElement modelElement : mRegistry.getModelElements()) {
             writer.emitStatement(
                     "mModelRepositories.put(%s.class, new %s(ellie, database, cacheSize))",
-                    modelRepositoryElement.getModelQualifiedName(),
-                    modelRepositoryElement.getQualifiedName()
+                    modelElement.getModelQualifiedName(),
+                    modelElement.getModelRepositoryQualifiedName()
             );
         }
 
