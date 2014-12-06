@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 import static javax.lang.model.element.ElementKind.CLASS;
@@ -45,7 +46,10 @@ public class ColumnValidator implements Validator {
     @Override
     public boolean validate(final Element enclosingElement, final Element element) {
         Table table = enclosingElement.getAnnotation(Table.class);
-        if (enclosingElement.getKind() != CLASS || table == null) {
+
+        boolean isAbstractClass = enclosingElement.getKind() == CLASS && enclosingElement.getModifiers().contains(Modifier.ABSTRACT);
+
+        if (!isAbstractClass && (enclosingElement.getKind() != CLASS || table == null)) {
             mMessager.printMessage(ERROR, "@Column fields can only be enclosed by model classes.", element);
             return false;
         }
