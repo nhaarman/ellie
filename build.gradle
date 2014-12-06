@@ -17,5 +17,5 @@ allprojects {
 
 subprojects {
 	project.group = GROUP
-	project.version = VERSION_NAME
+	project.version = VERSION_NAME + (RELEASE == "true" ? "" : "-SNAPSHOT")
 }
