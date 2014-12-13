@@ -1,11 +1,8 @@
 apply plugin: 'java'
 apply from: '../gradle/scripts/uploadArchives.gradle'
 
-def Properties props = new Properties()
-props.load(new FileInputStream(file('../local.properties')))
-
 def android = [
-		sdk   : props["sdk.dir"],
+		sdk   : System.getenv('ANDROID_HOME'),
 		target: 'android-21'
 ]
 
